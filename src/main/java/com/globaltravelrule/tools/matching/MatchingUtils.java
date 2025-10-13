@@ -1,0 +1,118 @@
+/*
+ * Copyright (c) 2022-2025 Global Travel Rule • globaltravelrule.com
+ * License that can be found in the LICENSE file.
+ * Author: Global Travel Rule developer
+ * Created on: 2025/9/15 09:29
+ */
+
+package com.globaltravelrule.tools.matching;
+
+import com.globaltravelrule.tools.matching.api.MatchingExecutor;
+import com.globaltravelrule.tools.matching.api.MatchingNamesProcessor;
+import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
+import com.globaltravelrule.tools.matching.exceptions.MatchingException;
+import com.globaltravelrule.tools.matching.options.MatchingOptions;
+import com.globaltravelrule.tools.matching.options.NameMatchingOptions;
+import com.globaltravelrule.tools.matching.result.MatchingResult;
+import com.globaltravelrule.tools.matching.result.NameMatchingResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
+
+
+/**
+ * global travel rule name matching utils
+ *
+ * @author Global Travel Rule developer
+ * @version 1.0.0
+ * @since 2025/9/15 09:29
+ *
+ */
+public class MatchingUtils {
+
+    private static final Logger log = LoggerFactory.getLogger(MatchingUtils.class);
+
+    private static volatile MatchingUtils instance;
+
+    private final Map<MatchingAlgorithm, MatchingExecutor> MATCHING_ALGORITHMS_HOLDER;
+
+    private MatchingUtils() {
+        MATCHING_ALGORITHMS_HOLDER = new HashMap<>(16);
+        ServiceLoader<MatchingExecutor> loader = ServiceLoader.load(MatchingExecutor.class);
+        loader.forEach(executor -> {
+            if (MATCHING_ALGORITHMS_HOLDER.containsKey(executor.getMatchingAlgorithm())) {
+                throw new MatchingException("Duplicate matching algorithm: " + executor.getMatchingAlgorithm() + ", please check your matching implementation dependencies config.");
+            }
+            MATCHING_ALGORITHMS_HOLDER.put(executor.getMatchingAlgorithm(), executor);
+        });
+    }
+
+    private static MatchingUtils getInstance() {
+        if (instance == null) {
+            synchronized (MatchingUtils.class) {
+                if (instance == null) {
+                    instance = new MatchingUtils();
+                }
+            }
+        }
+        return instance;
+    }
+
+    /**
+     * name match logic
+     *
+     * @param options matching options
+     * @return matching result
+     * @throws MatchingException matching exception
+     *
+     */
+    private List<MatchingResult> doMatchingNames(NameMatchingOptions options) {
+        MatchingExecutor executor = getMatchingExecutor(options.getAlgorithmType());
+        final Set<String> namesSet = new HashSet<>(options.getNames());
+        final Set<String> matchingNamesSet = new HashSet<>(options.getMatchingNames());
+        final List<MatchingResult> resultList = new ArrayList<>();
+        for (String name : namesSet) {
+            for (String matchingName : matchingNamesSet) {
+                String processedMatchingName = matchingName;
+                //process matching name
+                for (MatchingNamesProcessor namesProcessor : options.getMatchingNamesProcessors()) {
+                    processedMatchingName = namesProcessor.processMatchingNames(processedMatchingName);
+                }
+                MatchingResult result = executor.matching(new MatchingOptions(name, processedMatchingName));
+                resultList.add(result);
+                if (result != null && options.getThreshold() != null && result.getMatchingRate() > options.getThreshold()) {
+                    return resultList;
+                }
+            }
+        }
+        return resultList;
+    }
+
+    private MatchingExecutor getMatchingExecutor(String algorithmType) {
+        MatchingAlgorithm algorithm = MatchingAlgorithm.parse(algorithmType);
+        if (algorithm == null) {
+            throw new MatchingException("Unsupported matching algorithm: " + algorithmType);
+        }
+        if (!MATCHING_ALGORITHMS_HOLDER.containsKey(algorithm)) {
+            throw new MatchingException("Unsupported matching algorithm: " + algorithm + ", please check your matching implementation dependencies config.");
+        }
+        return MATCHING_ALGORITHMS_HOLDER.get(algorithm);
+    }
+
+    public static NameMatchingResult matchingNames(NameMatchingOptions options) {
+        float matchingRate = 0f;
+        boolean matched;
+        if (options.getNames() == null || options.getNames().isEmpty() || options.getMatchingNames() == null || options.getMatchingNames().isEmpty() || options.getThreshold() == null) {
+            log.error("Invalid input parameters for name matching: names, matchingNames, or threshold cannot be null or empty!");
+            return new NameMatchingResult(0f, false);
+        }
+        List<MatchingResult> resultList = MatchingUtils.getInstance().doMatchingNames(options);
+        if (!resultList.isEmpty()) {
+            Optional<MatchingResult> result = resultList.stream().max(Comparator.comparingDouble(MatchingResult::getMatchingRate));
+            matchingRate = result.map(MatchingResult::getMatchingRate).orElse(0f);
+        }
+        matched = matchingRate >= options.getThreshold();
+        return new NameMatchingResult(matchingRate, matched, resultList);
+    }
+}
