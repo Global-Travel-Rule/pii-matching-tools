@@ -8,13 +8,14 @@
 package com.globaltravelrule.tools.matching;
 
 import com.globaltravelrule.tools.matching.api.MatchingExecutor;
-import com.globaltravelrule.tools.matching.api.MatchingNamesProcessor;
+import com.globaltravelrule.tools.matching.api.NameProcessor;
 import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
 import com.globaltravelrule.tools.matching.exceptions.MatchingException;
 import com.globaltravelrule.tools.matching.options.MatchingOptions;
 import com.globaltravelrule.tools.matching.options.NameMatchingOptions;
 import com.globaltravelrule.tools.matching.result.MatchingResult;
 import com.globaltravelrule.tools.matching.result.NameMatchingResult;
+import com.globaltravelrule.tools.matching.utils.SetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,19 +70,33 @@ public class MatchingUtils {
      */
     private List<MatchingResult> doMatchingNames(NameMatchingOptions options) {
         MatchingExecutor executor = getMatchingExecutor(options.getAlgorithmType());
-        final Set<String> namesSet = new HashSet<>(options.getNames());
-        final Set<String> matchingNamesSet = new HashSet<>(options.getMatchingNames());
+        final List<Set<String>> namesList = new ArrayList<Set<String>>() {};
+        if (options.getNames() != null){
+            options.getNames().forEach(nameItems -> namesList.add(new HashSet<>(nameItems)));
+        }
+        final List<Set<String>> matchingNamesList = new ArrayList<>();
+        if (options.getMatchingNames() != null){
+            options.getMatchingNames().forEach(nameItems -> matchingNamesList.add(new HashSet<>(nameItems)));
+        }
+
         final List<MatchingResult> resultList = new ArrayList<>();
-        for (String name : namesSet) {
-            for (String matchingName : matchingNamesSet) {
-                String processedMatchingName = matchingName;
+        for (Set<String> nameSet  : namesList) {
+            Set<String> processedNameSet = nameSet;
+            //process name
+            for (NameProcessor nameProcessor : options.getNameProcessors()) {
+                processedNameSet = nameProcessor.processName(processedNameSet);
+            }
+            for (Set<String> matchingNameSet : matchingNamesList) {
+                Set<String> processedMatchingNameSet = matchingNameSet;
                 //process matching name
-                for (MatchingNamesProcessor namesProcessor : options.getMatchingNamesProcessors()) {
-                    processedMatchingName = namesProcessor.processMatchingNames(processedMatchingName);
+                for (NameProcessor nameProcessor : options.getNameProcessors()) {
+                    processedMatchingNameSet = nameProcessor.processName(processedMatchingNameSet);
                 }
-                MatchingResult result = executor.matching(new MatchingOptions(name, processedMatchingName));
+                MatchingResult result = executor.matching(new MatchingOptions(processedNameSet, processedMatchingNameSet));
+                result.setSource(SetUtils.nameSetToString(nameSet));
+                result.setTarget(SetUtils.nameSetToString(matchingNameSet));
                 resultList.add(result);
-                if (result != null && options.getThreshold() != null && result.getMatchingRate() > options.getThreshold()) {
+                if (options.getThreshold() != null && result.getMatchingRate() > options.getThreshold()) {
                     return resultList;
                 }
             }
@@ -104,7 +119,7 @@ public class MatchingUtils {
         float matchingRate = 0f;
         boolean matched;
         if (options.getNames() == null || options.getNames().isEmpty() || options.getMatchingNames() == null || options.getMatchingNames().isEmpty() || options.getThreshold() == null) {
-            log.error("Invalid input parameters for name matching: names, matchingNames, or threshold cannot be null or empty!");
+            log.warn("Invalid input parameters for name matching: names, matchingNames, or threshold cannot be null or empty!");
             return new NameMatchingResult(0f, false);
         }
         List<MatchingResult> resultList = MatchingUtils.getInstance().doMatchingNames(options);

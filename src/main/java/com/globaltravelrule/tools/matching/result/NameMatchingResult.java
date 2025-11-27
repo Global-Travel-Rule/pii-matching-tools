@@ -78,14 +78,16 @@ public class NameMatchingResult {
     }
 
     public void printMatchingStackTrace() {
-        if (nameMatchingStackTrace == null){
+        if (nameMatchingStackTrace == null) {
             return;
         }
         for (int i = 0; i < nameMatchingStackTrace.size(); i++) {
-            log.info("matching {} -> name : {} || matchingName : {}  || matchingRate : {}",
+            log.info("matching {} -> \n name : {} || matchingName : {} \n processedName:{} || processedMatchingName : {} \n matchingRate : {} \n",
                     i,
                     getNameMatchingStackTrace().get(i).getSource(),
                     getNameMatchingStackTrace().get(i).getTarget(),
+                    getNameMatchingStackTrace().get(i).getProcessedSource(),
+                    getNameMatchingStackTrace().get(i).getProcessedTarget(),
                     getNameMatchingStackTrace().get(i).getMatchingRate());
         }
     }
