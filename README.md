@@ -235,12 +235,31 @@ System requirements:
 Add the library to your pom.xml:
 
 ```xml
+<project>
+    <repositories>
+        <repository>
+            <id>global-travel-rule-github-public</id>
+            <name>Global Travel Rule GitHub Public Packages</name>
+            <url>https://maven.pkg.github.com/Global-Travel-Rule/pii-matching-tools</url>
+            <!-- public repository -->
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
-<dependency>
-    <groupId>com.globaltravelrule.tools</groupId>
-    <artifactId>pii-matching-tools</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-</dependency>
+    <dependencies>
+        <!-- globaltravelrule pii matching tools dependency -->
+        <dependency>
+            <groupId>com.globaltravelrule.tools</groupId>
+            <artifactId>pii-matching-tools</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+    </dependencies>
+</project>
 ```
 
 Build from source:
