@@ -29,14 +29,27 @@ public class MatchingResult {
      */
     private String target;
 
+
+    /**
+     * processed source content that to be compared
+     *
+     */
+    private String processedSource;
+
+    /**
+     * processed target content that to be matched
+     *
+     */
+    private String processedTarget;
+
     /**
      * matching rate
      * */
     private Float matchingRate;
 
-    public MatchingResult(String source, String target, Float matchingRate) {
-        this.source = source;
-        this.target = target;
+    public MatchingResult(String processedSource, String processedTarget, Float matchingRate) {
+        this.processedSource = processedSource;
+        this.processedTarget = processedTarget;
         this.matchingRate = matchingRate;
     }
 
@@ -54,6 +67,22 @@ public class MatchingResult {
 
     public void setTarget(String target) {
         this.target = target;
+    }
+
+    public String getProcessedSource() {
+        return processedSource;
+    }
+
+    public void setProcessedSource(String processedSource) {
+        this.processedSource = processedSource;
+    }
+
+    public String getProcessedTarget() {
+        return processedTarget;
+    }
+
+    public void setProcessedTarget(String processedTarget) {
+        this.processedTarget = processedTarget;
     }
 
     public Float getMatchingRate() {

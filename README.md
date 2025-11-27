@@ -236,31 +236,11 @@ Add the library to your pom.xml:
 
 ```xml
 
-<project>
-    <repositories>
-        <repository>
-            <id>global-travel-rule-github-public</id>
-            <name>Global Travel Rule GitHub Public Packages</name>
-            <url>https://maven.pkg.github.com/Global-Travel-Rule/pii-matching-tools</url>
-            <!-- public repository -->
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        <!-- globaltravelrule pii matching tools dependency -->
-        <dependency>
-            <groupId>com.globaltravelrule.tools</groupId>
-            <artifactId>pii-matching-tools</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-    </dependencies>
-</project>
+<dependency>
+    <groupId>com.globaltravelrule.tools</groupId>
+    <artifactId>pii-matching-tools</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+</dependency>
 ```
 
 Build from source:
@@ -284,38 +264,41 @@ import com.globaltravelrule.tools.matching.result.NameMatchingResult;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Example {
 
     public static void main(String[] args) {
         float threshold = 0.9f;
-        List<String> names = new ArrayList<>(Arrays.asList("Jon", "Becky", "Allen"));
-        List<String> matchingNames = new ArrayList<>(Arrays.asList("Tom", "Sean", "Allen"));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Collections.singletonList("Jon"), Collections.singletonList("Becky"), Collections.singletonList("Allen")));
+        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("Tom"), Collections.singletonList("Sean"), Collections.singletonList("Allen")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, threshold));
         result.printMatchingStackTrace();
         System.out.println("matching rate1:" + result.getMatchingRate() + " matching result1:" + result.getMatched());
 
-        List<String> names2 = new ArrayList<>(Arrays.asList(
-                "tudor-andrei vilceanu",
-                "tudorandrei vilceanu",
-                "vilceanu tudorandrei",
-                "vilceanu tudor-andrei",
-                "Tudor-Andrei Vilceanu",
-                "Vilceanu Tudor-Andrei"));
-        List<String> matchingNames2 = new ArrayList<>(List.of("tudorandei vilceanu"));
+        List<List<String>> names2 = new ArrayList<>(
+                Arrays.asList(
+                        Arrays.asList("tudor-andrei", "vilceanu"),
+                        Arrays.asList("tudorandrei", "vilceanu"),
+                        Arrays.asList("vilceanu", "tudorandrei"),
+                        Arrays.asList("vilceanu", "tudor-andrei"),
+                        Arrays.asList("Tudor-Andrei", "Vilceanu"),
+                        Arrays.asList("Vilceanu", "Tudor-Andrei")));
+        List<List<String>> matchingNames2 = new ArrayList<>(Collections.singletonList(Arrays.asList("tudorandei", "vilceanu")));
         NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(names2, matchingNames2, threshold));
         result2.printMatchingStackTrace();
         System.out.println("matching rate2:" + result.getMatchingRate() + " matching result2:" + result.getMatched());
 
-        List<String> names3 = new ArrayList<>(Arrays.asList(
-                "tudor-andrei vilceanu",
-                "tudorandrei vilceanu",
-                "vilceanu tudorandrei",
-                "vilceanu tudor-andrei",
-                "Tudor-Andrei Vilceanu",
-                "Vilceanu Tudor-Andrei"));
-        List<String> matchingNames3 = new ArrayList<>(Arrays.asList("tudorvilceanu", "tudorvilceanu"));
+        List<List<String>> names3 = new ArrayList<>(
+                Arrays.asList(
+                        Arrays.asList("tudor-andrei", "vilceanu"),
+                        Arrays.asList("tudorandrei", "vilceanu"),
+                        Arrays.asList("vilceanu", "tudorandrei"),
+                        Arrays.asList("vilceanu", "tudor-andrei"),
+                        Arrays.asList("Tudor-Andrei", "Vilceanu"),
+                        Arrays.asList("Vilceanu", "Tudor-Andrei")));
+        List<List<String>> matchingNames3 = new ArrayList<>(Arrays.asList(Collections.singletonList("tudorvilceanu"), Collections.singletonList("tudorvilceanu")));
         NameMatchingResult result3 = MatchingUtils.matchingNames(new NameMatchingOptions(names3, matchingNames3, threshold));
         result3.printMatchingStackTrace();
         System.out.println("matching rate3:" + result3.getMatchingRate() + " matching result3:" + result3.getMatched());
@@ -326,23 +309,126 @@ public class Example {
 Expected output (example):
 
 ```text
-matching 0 -> name : tom || matchingName : Jon  || matchingRate : 0.33
-matching 1 -> name : sean || matchingName : Jon  || matchingRate : 0.29
-matching 2 -> name : allen || matchingName : Jon  || matchingRate : 0.25
-matching 3 -> name : tom || matchingName : Allen  || matchingRate : 0.0
-matching 4 -> name : sean || matchingName : Allen  || matchingRate : 0.44
-matching 5 -> name : allen || matchingName : Allen  || matchingRate : 1.0
+matching 0 -> 
+ name : Jon || matchingName : Tom 
+ processedName:jon || processedMatchingName : tom 
+ matchingRate : 0.33 
+
+matching 1 -> 
+ name : Jon || matchingName : Sean 
+ processedName:jon || processedMatchingName : sean 
+ matchingRate : 0.29 
+
+matching 2 -> 
+ name : Jon || matchingName : Allen 
+ processedName:jon || processedMatchingName : allen 
+ matchingRate : 0.25 
+
+matching 3 -> 
+ name : Becky || matchingName : Tom 
+ processedName:becky || processedMatchingName : tom 
+ matchingRate : 0.0 
+
+matching 4 -> 
+ name : Becky || matchingName : Sean 
+ processedName:becky || processedMatchingName : sean 
+ matchingRate : 0.22 
+
+matching 5 -> 
+ name : Becky || matchingName : Allen 
+ processedName:becky || processedMatchingName : allen 
+ matchingRate : 0.2 
+
+matching 6 -> 
+ name : Allen || matchingName : Tom 
+ processedName:allen || processedMatchingName : tom 
+ matchingRate : 0.0 
+
+matching 7 -> 
+ name : Allen || matchingName : Sean 
+ processedName:allen || processedMatchingName : sean 
+ matchingRate : 0.44 
+
+matching 8 -> 
+ name : Allen || matchingName : Allen 
+ processedName:allen || processedMatchingName : allen 
+ matchingRate : 1.0 
+
 matching rate1:1.0 matching result1:true
-matching 0 -> name : tudorandei vilceanu || matchingName : tudor-andrei vilceanu  || matchingRate : 0.7
-matching 1 -> name : tudorandei vilceanu || matchingName : vilceanu tudorandrei  || matchingRate : 0.97
+
+matching 0 -> 
+ name : tudor-andrei vilceanu || matchingName : vilceanu tudorandei 
+ processedName:vilceanu andrei tudor || processedMatchingName : vilceanu tudorandei 
+ matchingRate : 0.7 
+
+matching 1 -> 
+ name : vilceanu tudorandrei || matchingName : vilceanu tudorandei 
+ processedName:vilceanu tudorandrei || processedMatchingName : vilceanu tudorandei 
+ matchingRate : 0.97 
+
 matching rate2:1.0 matching result2:true
-matching 0 -> name : tudorvilceanu || matchingName : tudor-andrei vilceanu  || matchingRate : 0.76
-matching 1 -> name : tudorvilceanu || matchingName : vilceanu tudorandrei  || matchingRate : 0.79
-matching 2 -> name : tudorvilceanu || matchingName : Tudor-Andrei Vilceanu  || matchingRate : 0.76
-matching 3 -> name : tudorvilceanu || matchingName : vilceanu tudor-andrei  || matchingRate : 0.76
-matching 4 -> name : tudorvilceanu || matchingName : Vilceanu Tudor-Andrei  || matchingRate : 0.76
-matching 5 -> name : tudorvilceanu || matchingName : tudorandrei vilceanu  || matchingRate : 0.79
-matching rate3:0.79 matching result3:false 
+
+matching 0 -> 
+ name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 1 -> 
+ name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 2 -> 
+ name : vilceanu tudorandrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 3 -> 
+ name : vilceanu tudorandrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 4 -> 
+ name : vilceanu tudorandrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 5 -> 
+ name : vilceanu tudorandrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 6 -> 
+ name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 7 -> 
+ name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 8 -> 
+ name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 9 -> 
+ name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 10 -> 
+ name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 11 -> 
+ name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
+ processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching rate3:0.79 matching result3:false
 ```
 
 ---

@@ -7,8 +7,8 @@
 
 package com.globaltravelrule.tools.matching.options;
 
-import com.globaltravelrule.tools.matching.api.MatchingNamesProcessor;
-import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleMatchingNamesProcessor;
+import com.globaltravelrule.tools.matching.api.NameProcessor;
+import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleNameProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,48 +24,52 @@ import java.util.List;
 public class NameMatchingOptions {
 
     /**
-     * Name to be matched
-     * */
-    private List<String> names;
+     * Names to be matched
+     * subitem of name is a list of strings, representing the different formats of the name (first name, middle name, last name, etc.)
+     *
+     */
+    private List<List<String>> names;
 
     /**
      * The name of the reference to be matched, such as the KYC name of the business system
-     * */
-    private List<String> matchingNames;
+     * subitem of name is a list of strings, representing the different formats of the name (first name, middle name, last name, etc.)
+     *
+     */
+    private List<List<String>> matchingNames;
 
     private Float threshold;
 
     private String algorithmType = "default";
 
-    private List<MatchingNamesProcessor> matchingNamesProcessors = new ArrayList<>();
+    private List<NameProcessor> nameProcessors = new ArrayList<>();
 
     public NameMatchingOptions() {
     }
 
-    public NameMatchingOptions(List<String> names, List<String> matchingNames) {
+    public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames) {
         this.names = names;
         this.matchingNames = matchingNames;
-        this.matchingNamesProcessors.add(new GlobalTravelRuleMatchingNamesProcessor());
+        this.nameProcessors.add(new GlobalTravelRuleNameProcessor());
     }
 
-    public NameMatchingOptions(List<String> names, List<String> matchingNames, Float threshold) {
-        this(names,matchingNames);
+    public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold) {
+        this(names, matchingNames);
         this.threshold = threshold;
     }
 
-    public List<String> getNames() {
+    public List<List<String>> getNames() {
         return names;
     }
 
-    public void setNames(List<String> names) {
+    public void setNames(List<List<String>> names) {
         this.names = names;
     }
 
-    public List<String> getMatchingNames() {
+    public List<List<String>> getMatchingNames() {
         return matchingNames;
     }
 
-    public void setMatchingNames(List<String> matchingNames) {
+    public void setMatchingNames(List<List<String>> matchingNames) {
         this.matchingNames = matchingNames;
     }
 
@@ -85,11 +89,11 @@ public class NameMatchingOptions {
         this.algorithmType = algorithmType;
     }
 
-    public List<MatchingNamesProcessor> getMatchingNamesProcessors() {
-        return matchingNamesProcessors;
+    public List<NameProcessor> getNameProcessors() {
+        return nameProcessors;
     }
 
-    public void setMatchingNamesProcessors(List<MatchingNamesProcessor> matchingNamesProcessors) {
-        this.matchingNamesProcessors = matchingNamesProcessors;
+    public void setNameProcessors(List<NameProcessor> nameProcessors) {
+        this.nameProcessors = nameProcessors;
     }
 }

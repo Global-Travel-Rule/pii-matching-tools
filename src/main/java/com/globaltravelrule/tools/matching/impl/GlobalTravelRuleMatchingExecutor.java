@@ -13,6 +13,7 @@ import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
 import com.globaltravelrule.tools.matching.exceptions.MatchingException;
 import com.globaltravelrule.tools.matching.options.MatchingOptions;
 import com.globaltravelrule.tools.matching.result.MatchingResult;
+import com.globaltravelrule.tools.matching.utils.SetUtils;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,28 +38,32 @@ public class GlobalTravelRuleMatchingExecutor implements MatchingExecutor {
 
     @Override
     public MatchingResult matching(MatchingOptions options) throws MatchingException {
-        if (options.getSource() == null || options.getSource().isEmpty()
-                || options.getTarget() == null || options.getTarget().isEmpty()) {
-            return new MatchingResult(options.getSource(), options.getTarget(), 0f);
+        String compareSource = SetUtils.nameSetToString(options.getSource());
+        String compareTarget = SetUtils.nameSetToString(options.getTarget());
+
+        if (compareSource.isEmpty() || compareTarget.isEmpty()) {
+            return new MatchingResult(SetUtils.nameSetToString(options.getSource()), SetUtils.nameSetToString(options.getTarget()), 0f);
         }
         //check any matching logic
-        if (options.getSource() != null && options.getSource().equals(options.getTarget())) {
-            return new MatchingResult(options.getSource(), options.getTarget(), 1.0f);
-        }
-        String compareSource = options.getSource();
-        String compareTarget = options.getTarget();
-        if (hasChineseCharacter(compareSource)) {
-            compareSource = simplifyChineseCharacters(compareSource);
-        }
-        if (hasChineseCharacter(compareTarget)) {
-            compareTarget = simplifyChineseCharacters(compareTarget);
-        }
         if (compareSource.equals(compareTarget)) {
-            return new MatchingResult(options.getSource(), options.getTarget(), 1.0f);
+            return new MatchingResult(compareSource, compareTarget, 1.0f);
+        }
+
+        String simplifyCompareSource = compareSource;
+        if (hasChineseCharacter(compareSource)) {
+            simplifyCompareSource = simplifyChineseCharacters(compareSource);
+        }
+        String simplifyCompareTarget = compareTarget;
+        if (hasChineseCharacter(compareTarget)) {
+            simplifyCompareTarget = simplifyChineseCharacters(compareTarget);
+        }
+
+        if (simplifyCompareSource.equals(simplifyCompareTarget)) {
+            return new MatchingResult(compareSource, compareTarget, 1.0f);
         }
         //fuzzy matching logic
-        float similarity = FuzzySearch.tokenSortRatio(compareSource, compareTarget) / 100.0f;
-        return new MatchingResult(options.getSource(), options.getTarget(), similarity);
+        float similarity = FuzzySearch.tokenSortRatio(simplifyCompareSource, simplifyCompareTarget) / 100.0f;
+        return new MatchingResult(compareSource, compareTarget, similarity);
     }
 
     protected boolean hasChineseCharacter(String str) {
