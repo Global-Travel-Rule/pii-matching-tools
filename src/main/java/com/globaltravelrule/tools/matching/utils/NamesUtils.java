@@ -7,7 +7,7 @@
 
 package com.globaltravelrule.tools.matching.utils;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * @author Global Travel Rule developer
@@ -15,12 +15,12 @@ import java.util.Set;
  * @since 2025/11/14 16:56
  *
  */
-public class SetUtils {
+public class NamesUtils {
 
-    public static String nameSetToString(Set<String> nameSet){
-        if (nameSet == null || nameSet.isEmpty()){
+    public static String namesToString(Collection<String> names){
+        if (names == null || names.isEmpty()){
             return "";
         }
-        return String.join(" ", nameSet);
+        return String.join(" ", names);
     }
 }

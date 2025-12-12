@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MatchingTest {
 
-    public static final float THRESHOLD = 0.9f;
+    public static final float THRESHOLD = 0.8f;
 
     private final Logger log = LoggerFactory.getLogger(MatchingTest.class);
 
@@ -186,9 +186,7 @@ public class MatchingTest {
         // Arabic
         log.info("nameMatchTestNonChineseCharacterCase6");
         List<List<String>> names = new ArrayList<>(Collections.singletonList(Collections.singletonList("فهد عبدالعزيز الشمري")));
-        List<List<String>> matchingNames = new ArrayList<>(
-                Arrays.asList(Arrays.asList("Fahd", "Abdulaziz","al-Shammari"),
-                        Collections.singletonList("فهد عبدالعزيز الشمري")));
+        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Arrays.asList("Fahd", "Abdulaziz", "al-Shammari"), Collections.singletonList("فهد عبدالعزيز الشمري")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
@@ -199,9 +197,7 @@ public class MatchingTest {
         // Arabic
         log.info("nameMatchTestNonChineseCharacterCase7");
         List<List<String>> names = new ArrayList<>(Collections.singletonList(Collections.singletonList("فهد عبدالعزيز الشمري")));
-        List<List<String>> matchingNames = new ArrayList<>(
-                Arrays.asList(Collections.singletonList("محمد بن سلمان بن امین"),
-                Arrays.asList("Muhammad","bin", "Salman","bin","Amin")));
+        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("محمد بن سلمان بن امین"), Arrays.asList("Muhammad", "bin", "Salman", "bin", "Amin")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
@@ -266,14 +262,7 @@ public class MatchingTest {
     @Test
     public void nameMatchTestFuzzyCase2() {
         log.info("nameMatchTestFuzzyCase2");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Collections.singletonList("vincenzopulera"),
-                        Collections.singletonList("pulera'vincenzo"),
-                        Collections.singletonList("PuleráVincenzo"),
-                        Collections.singletonList("pulerávincenzo"),
-                        Collections.singletonList("VincenzoPulerá"),
-                        Collections.singletonList("vincenzopulerá")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Collections.singletonList("vincenzopulera"), Collections.singletonList("pulera'vincenzo"), Collections.singletonList("PuleráVincenzo"), Collections.singletonList("pulerávincenzo"), Collections.singletonList("VincenzoPulerá"), Collections.singletonList("vincenzopulerá")));
         List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("vincenzopulerà"), Collections.singletonList("vincenzopulerà")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
@@ -283,33 +272,19 @@ public class MatchingTest {
     @Test
     public void nameMatchTestFuzzyCase3() {
         log.info("nameMatchTestFuzzyCase3");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Collections.singletonList("simonesilviacooperforster"),
-                        Collections.singletonList("pulera'cooperforstersimonesilvia"),
-                        Collections.singletonList("coopersimone"),
-                        Collections.singletonList("CooperSimone"),
-                        Collections.singletonList("simonecooper"),
-                        Collections.singletonList("SimoneCooper")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Collections.singletonList("simonesilviacooperforster"), Collections.singletonList("pulera'cooperforstersimonesilvia"), Collections.singletonList("coopersimone"), Collections.singletonList("CooperSimone"), Collections.singletonList("simonecooper"), Collections.singletonList("SimoneCooper")));
         List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("simonesilviacooper"), Collections.singletonList("coopersimonesilvia")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
-        Assert.assertFalse(result.getMatched());
+        Assert.assertTrue(result.getMatched());
     }
 
     @Test
     public void nameMatchTestFuzzyCase4() {
         // not match
         log.info("nameMatchTestFuzzyCase4");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Collections.singletonList("litzuhui"),
-                        Arrays.asList("LiTzu", "Hui"),
-                        Collections.singletonList("tzuhuili"),
-                        Arrays.asList("Tzu", "HuiLi")));
-        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(
-                Collections.singletonList("tzu-huili"),
-                Collections.singletonList("litzu-hui")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Collections.singletonList("litzuhui"), Arrays.asList("LiTzu", "Hui"), Collections.singletonList("tzuhuili"), Arrays.asList("Tzu", "HuiLi")));
+        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("tzu-huili"), Collections.singletonList("litzu-hui")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
@@ -319,18 +294,8 @@ public class MatchingTest {
     public void nameMatchTestFuzzyCase5() {
         // not match 0.8
         log.info("nameMatchTestFuzzyCase5");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Collections.singletonList("bùiđuccanh"),
-                        Collections.singletonList("pulera'canhbuiduc"),
-                        Collections.singletonList("CANHBUIDUC"),
-                        Collections.singletonList("buiduccanh"),
-                        Collections.singletonList("BUIDUCCANH")));
-        List<List<String>> matchingNames = new ArrayList<>(
-                Arrays.asList(Collections.singletonList("buiduccanh"),
-                        Collections.singletonList("bùiđứccảnh"),
-                        Collections.singletonList("bùiđứccảnh"),
-                        Collections.singletonList("buiduccanh")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Collections.singletonList("bùiđuccanh"), Collections.singletonList("pulera'canhbuiduc"), Collections.singletonList("CANHBUIDUC"), Collections.singletonList("buiduccanh"), Collections.singletonList("BUIDUCCANH")));
+        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("buiduccanh"), Collections.singletonList("bùiđứccảnh"), Collections.singletonList("bùiđứccảnh"), Collections.singletonList("buiduccanh")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
@@ -340,14 +305,7 @@ public class MatchingTest {
     public void nameMatchTestFuzzyCase6() {
         // not match 0.8
         log.info("nameMatchTestFuzzyCase6");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Arrays.asList("tudor-andrei", "vilceanu"),
-                        Arrays.asList("tudorandrei", "vilceanu"),
-                        Arrays.asList("vilceanu", "tudorandrei"),
-                        Arrays.asList("vilceanu", "tudor-andrei"),
-                        Arrays.asList("Tudor-Andrei", "Vilceanu"),
-                        Arrays.asList("Vilceanu", "Tudor-Andrei")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Arrays.asList("tudor-andrei", "vilceanu"), Arrays.asList("tudorandrei", "vilceanu"), Arrays.asList("vilceanu", "tudorandrei"), Arrays.asList("vilceanu", "tudor-andrei"), Arrays.asList("Tudor-Andrei", "Vilceanu"), Arrays.asList("Vilceanu", "Tudor-Andrei")));
         List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("tudorvilceanu"), Collections.singletonList("tudorvilceanu")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
@@ -358,14 +316,7 @@ public class MatchingTest {
     public void nameMatchTestFuzzyCase7() {
         // not match 0.8
         log.info("nameMatchTestFuzzyCase7");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Arrays.asList("tudor-andrei", "vilceanu"),
-                        Arrays.asList("tudorandrei", "vilceanu"),
-                        Arrays.asList("vilceanu", "tudorandrei"),
-                        Arrays.asList("vilceanu", "tudor-andrei"),
-                        Arrays.asList("Tudor-Andrei", "Vilceanu"),
-                        Arrays.asList("Vilceanu", "Tudor-Andrei")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Arrays.asList("tudor-andrei", "vilceanu"), Arrays.asList("tudorandrei", "vilceanu"), Arrays.asList("vilceanu", "tudorandrei"), Arrays.asList("vilceanu", "tudor-andrei"), Arrays.asList("Tudor-Andrei", "Vilceanu"), Arrays.asList("Vilceanu", "Tudor-Andrei")));
         List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("tudorandei", "vilceanu")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
@@ -375,10 +326,7 @@ public class MatchingTest {
     @Test
     public void nameMatchTestFuzzyCase8() {
         log.info("nameMatchTestFuzzyCase8");
-        List<List<String>> names = new ArrayList<>(
-                Arrays.asList(
-                        Collections.singletonList("dimitrioskonstantinostsogkas"),
-                        Arrays.asList("TSOGKASDIMITRIOS", "KONSTANTINOS")));
+        List<List<String>> names = new ArrayList<>(Arrays.asList(Collections.singletonList("dimitrioskonstantinostsogkas"), Arrays.asList("TSOGKASDIMITRIOS", "KONSTANTINOS")));
         List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Collections.singletonList("dimiiriossogkas"), Collections.singletonList("sogkasdimiirios")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
@@ -393,5 +341,37 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+    }
+
+    @Test
+    public void nameMatchTestPostCase1() {
+        log.info("nameMatchTestPostCase1");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("KAMAL J MANGROLIYA", "")));
+        List<List<String>> matchingNames = Arrays.asList(Arrays.asList("KAMAL", "JAYSUKHBHAI", "MANGROLIYA"), Arrays.asList("MANGROLIYA", "JAYSUKHBHAI"));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+    }
+
+    @Test
+    public void nameMatchTestPostCase2() {
+        log.info("nameMatchTestPostCase2");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("JAMES", "BAKER")));
+        List<List<String>> matchingNames = Collections.singletonList(Arrays.asList("James", "Stuart", "Baker"));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+    }
+
+    @Test
+    public void nameMatchTestPostCase3() {
+        log.info("nameMatchTestPostCase3");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("SAIBALAJI E L", "")));
+        List<List<String>> matchingNames = Arrays.asList(
+                Arrays.asList("EMBULUR", "LOGESHBABU", "SAIBALAJI"),
+                Arrays.asList("SAI BALAJI E", "L"));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
     }
 }

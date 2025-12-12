@@ -8,7 +8,9 @@
 package com.globaltravelrule.tools.matching.options;
 
 import com.globaltravelrule.tools.matching.api.NameProcessor;
+import com.globaltravelrule.tools.matching.api.PostMatchingProcessor;
 import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleNameProcessor;
+import com.globaltravelrule.tools.matching.impl.GlobalTravelRulePostMatchingProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +45,8 @@ public class NameMatchingOptions {
 
     private List<NameProcessor> nameProcessors = new ArrayList<>();
 
+    private List<PostMatchingProcessor> postMatchingProcessors = new ArrayList<>();
+
     public NameMatchingOptions() {
     }
 
@@ -50,6 +54,7 @@ public class NameMatchingOptions {
         this.names = names;
         this.matchingNames = matchingNames;
         this.nameProcessors.add(new GlobalTravelRuleNameProcessor());
+        this.postMatchingProcessors.add(new GlobalTravelRulePostMatchingProcessor());
     }
 
     public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold) {
@@ -95,5 +100,13 @@ public class NameMatchingOptions {
 
     public void setNameProcessors(List<NameProcessor> nameProcessors) {
         this.nameProcessors = nameProcessors;
+    }
+
+    public List<PostMatchingProcessor> getPostMatchingProcessors() {
+        return postMatchingProcessors;
+    }
+
+    public void setPostMatchingProcessors(List<PostMatchingProcessor> postMatchingProcessors) {
+        this.postMatchingProcessors = postMatchingProcessors;
     }
 }

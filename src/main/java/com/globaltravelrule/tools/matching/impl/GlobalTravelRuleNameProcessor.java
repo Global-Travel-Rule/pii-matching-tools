@@ -29,11 +29,11 @@ public class GlobalTravelRuleNameProcessor implements NameProcessor {
     public static final String NAMES_SPLITER = " ";
 
     @Override
-    public Set<String> processName(Set<String> nameItems) {
+    public List<String> processName(List<String> nameItems) {
         if (nameItems == null || nameItems.isEmpty()) {
             return nameItems;
         }
-        Set<String> processedNameItems = new HashSet<>();
+        List<String> processedNameItems = new ArrayList<>();
         for (String nameItem : nameItems) {
             String processedNameItem = Optional.ofNullable(nameItem).map(t ->
                     t.toLowerCase().replaceAll(SYMBOL_NEED_TO_REPLACE_REGEX, NAMES_SPLITER).trim())

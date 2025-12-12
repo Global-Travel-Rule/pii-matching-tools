@@ -9,13 +9,14 @@ package com.globaltravelrule.tools.matching;
 
 import com.globaltravelrule.tools.matching.api.MatchingExecutor;
 import com.globaltravelrule.tools.matching.api.NameProcessor;
+import com.globaltravelrule.tools.matching.api.PostMatchingProcessor;
 import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
 import com.globaltravelrule.tools.matching.exceptions.MatchingException;
 import com.globaltravelrule.tools.matching.options.MatchingOptions;
 import com.globaltravelrule.tools.matching.options.NameMatchingOptions;
 import com.globaltravelrule.tools.matching.result.MatchingResult;
 import com.globaltravelrule.tools.matching.result.NameMatchingResult;
-import com.globaltravelrule.tools.matching.utils.SetUtils;
+import com.globaltravelrule.tools.matching.utils.NamesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class MatchingUtils {
         });
     }
 
-    private static MatchingUtils getInstance() {
+    public static MatchingUtils getInstance() {
         if (instance == null) {
             synchronized (MatchingUtils.class) {
                 if (instance == null) {
@@ -68,40 +69,54 @@ public class MatchingUtils {
      * @throws MatchingException matching exception
      *
      */
-    private List<MatchingResult> doMatchingNames(NameMatchingOptions options) {
-        MatchingExecutor executor = getMatchingExecutor(options.getAlgorithmType());
-        final List<Set<String>> namesList = new ArrayList<Set<String>>() {};
-        if (options.getNames() != null){
-            options.getNames().forEach(nameItems -> namesList.add(new HashSet<>(nameItems)));
+    public NameMatchingResult doMatchingNames(NameMatchingOptions options) {
+        float matchingRate = 0f;
+        boolean matched;
+        if (options.getNames() == null || options.getNames().isEmpty() || options.getMatchingNames() == null || options.getMatchingNames().isEmpty() || options.getThreshold() == null) {
+            log.warn("Invalid input parameters for name matching: names, matchingNames, or threshold cannot be null or empty!");
+            return new NameMatchingResult(0f, false);
         }
-        final List<Set<String>> matchingNamesList = new ArrayList<>();
-        if (options.getMatchingNames() != null){
-            options.getMatchingNames().forEach(nameItems -> matchingNamesList.add(new HashSet<>(nameItems)));
+
+        MatchingExecutor executor = getMatchingExecutor(options.getAlgorithmType());
+        final List<List<String>> namesList = new ArrayList<>() {
+        };
+        if (options.getNames() != null) {
+            options.getNames().forEach(nameItems -> namesList.add(new ArrayList<>(nameItems)));
+        }
+        final List<List<String>> matchingNamesList = new ArrayList<>();
+        if (options.getMatchingNames() != null) {
+            options.getMatchingNames().forEach(nameItems -> matchingNamesList.add(new ArrayList<>(nameItems)));
         }
 
         final List<MatchingResult> resultList = new ArrayList<>();
-        for (Set<String> nameSet  : namesList) {
-            Set<String> processedNameSet = nameSet;
+        for (List<String> nameList : namesList) {
+            List<String> processedNameList = nameList;
             //process name
             for (NameProcessor nameProcessor : options.getNameProcessors()) {
-                processedNameSet = nameProcessor.processName(processedNameSet);
+                processedNameList = nameProcessor.processName(processedNameList);
             }
-            for (Set<String> matchingNameSet : matchingNamesList) {
-                Set<String> processedMatchingNameSet = matchingNameSet;
+            for (List<String> matchingNameList : matchingNamesList) {
+                List<String> processedMatchingNameList = matchingNameList;
                 //process matching name
                 for (NameProcessor nameProcessor : options.getNameProcessors()) {
-                    processedMatchingNameSet = nameProcessor.processName(processedMatchingNameSet);
+                    processedMatchingNameList = nameProcessor.processName(processedMatchingNameList);
                 }
-                MatchingResult result = executor.matching(new MatchingOptions(processedNameSet, processedMatchingNameSet));
-                result.setSource(SetUtils.nameSetToString(nameSet));
-                result.setTarget(SetUtils.nameSetToString(matchingNameSet));
+                MatchingResult result = executor.matching(new MatchingOptions(processedNameList, processedMatchingNameList));
+                result.setSource(NamesUtils.namesToString(nameList));
+                result.setTarget(NamesUtils.namesToString(matchingNameList));
                 resultList.add(result);
                 if (options.getThreshold() != null && result.getMatchingRate() > options.getThreshold()) {
-                    return resultList;
+                    break;
                 }
             }
         }
-        return resultList;
+        if (!resultList.isEmpty()) {
+            Optional<MatchingResult> result = resultList.stream().max(Comparator.comparingDouble(MatchingResult::getMatchingRate));
+            matchingRate = result.map(MatchingResult::getMatchingRate).orElse(0f);
+        }
+        matched = matchingRate >= options.getThreshold();
+        return new NameMatchingResult(matchingRate, matched, resultList);
+
     }
 
     private MatchingExecutor getMatchingExecutor(String algorithmType) {
@@ -116,18 +131,11 @@ public class MatchingUtils {
     }
 
     public static NameMatchingResult matchingNames(NameMatchingOptions options) {
-        float matchingRate = 0f;
-        boolean matched;
-        if (options.getNames() == null || options.getNames().isEmpty() || options.getMatchingNames() == null || options.getMatchingNames().isEmpty() || options.getThreshold() == null) {
-            log.warn("Invalid input parameters for name matching: names, matchingNames, or threshold cannot be null or empty!");
-            return new NameMatchingResult(0f, false);
+        NameMatchingResult result = MatchingUtils.getInstance().doMatchingNames(options);
+        //post process matching
+        for (PostMatchingProcessor postProcessor : options.getPostMatchingProcessors()) {
+            result = postProcessor.processMatch(options, result);
         }
-        List<MatchingResult> resultList = MatchingUtils.getInstance().doMatchingNames(options);
-        if (!resultList.isEmpty()) {
-            Optional<MatchingResult> result = resultList.stream().max(Comparator.comparingDouble(MatchingResult::getMatchingRate));
-            matchingRate = result.map(MatchingResult::getMatchingRate).orElse(0f);
-        }
-        matched = matchingRate >= options.getThreshold();
-        return new NameMatchingResult(matchingRate, matched, resultList);
+        return result;
     }
 }

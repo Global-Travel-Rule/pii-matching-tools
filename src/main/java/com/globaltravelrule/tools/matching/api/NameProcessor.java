@@ -7,7 +7,7 @@
 
 package com.globaltravelrule.tools.matching.api;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * process name, before applying the matching logic.
@@ -24,7 +24,7 @@ public interface NameProcessor {
      * @param nameItems the name items to process (first name, middle name, last name, etc.)
      * @return processed nameItems
      */
-    default Set<String> processName(Set<String> nameItems) {
+    default List<String> processName(List<String> nameItems) {
         return nameItems;
     }
 }
