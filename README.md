@@ -70,10 +70,16 @@ graph TD
     C --> D[Sort: Alphabetically sort tokens]
     D --> E[Reconstruct: Join sorted tokens with spaces]
     E --> F{Check empty strings?}
-    F -->|Yes| G[Return score: 0]
-    F -->|No| H[Calculate Levenshtein ratio]
-    H --> I[Return similarity score 0-100]
-    I --> J[End]
+    F --> |Yes| G[Return score: 0]
+    G --> K[End]
+    F --> |No| H[Calculate Levenshtein ratio]
+    H --> J{Check Matching Rate Reach?}
+    J --> |No| L[Rematch: remove middle name of traget matching name]
+    L --> N[Calculate Levenshtein ratio]
+    N --> M[Return similarity score 0-100]
+    M --> K
+    J --> |Yes| I[Return similarity score 0-100]
+    I --> K
 ```
 
 ### Detailed Process Description
@@ -235,6 +241,7 @@ System requirements:
 Add the library to your pom.xml:
 
 ```xml
+
 <project>
     <repositories>
         <repository>
@@ -256,7 +263,7 @@ Add the library to your pom.xml:
         <dependency>
             <groupId>com.globaltravelrule.tools</groupId>
             <artifactId>pii-matching-tools</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 </project>
@@ -492,10 +499,10 @@ Exceptions:
 
 2) Chinese Simplified/Traditional matching
 
-- names: ["杨阳"]
-- matchingNames: ["楊陽"]
-- threshold: 0.9f  
-  MatchingUtils uses OpenCC to handle conversion and compare.
+    - names: ["杨阳"]
+    - matchingNames: ["楊陽"]
+    - threshold: 0.9f  
+      MatchingUtils uses OpenCC to handle conversion and compare.
 
 3) Custom name processors  
    Implement MatchingNamesProcessor to preprocess names (remove punctuation, normalize case, trim, etc.) and set
@@ -554,6 +561,32 @@ Generate surefire report:
 Test coverage includes null-safety, multi-language cases, diacritics, fuzzy matching, and edge cases.
 
 ---
+
+## Name Verification And Processing Best Practices
+
+Standard matching names fields (first, last, middle) for better accuracy. A lightweight logical for validating and
+standardizing name fields structured as [first_name, middle_name, last_name]. Ensures name fields are clean, consistent,
+and free of unwanted special characters.
+
+- NameValidator: Validates individual name fields against configurable rules.
+
+  | Allowed Characters                                        | Prohibited Characters            |
+      |:----------------------------------------------------------|:---------------------------------|
+  | Alphabetic characters (A-Z, a-z, including international) | Numbers (0-9)                    |
+  | Spaces (single spaces between words)                      | Punctuation (.,;:!?)             |
+  | Hyphens (-) for compound names                            | Special symbols (@#$%^&*)        |
+  | Apostrophes (') for names like O'Connor                   | Emojis and other Unicode symbols |
+
+  | Field       | Required      | Max Length | Additional Rules                   |
+      |:------------|:--------------|:-----------|:-----------------------------------|
+  | First Name  | Numbers (0-9) | Yes        | 50 chars                           |
+  | Middle Name | No            | 50 chars   | Optional; can be empty string      |
+  | Last Name   | Yes           | 50 chars   | Cannot start/end with special char |
+    - No consecutive special characters (e.g., --, '')
+    - No leading/trailing special characters
+    - Empty middle name is acceptable
+- NameStandardizer: Cleans and normalizes name fields to consistent formatting.
+- Tool Script：[pii_matching_tools.py](scripts/pii_matching_tools.py)
 
 ## Best Practices
 

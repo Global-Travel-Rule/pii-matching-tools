@@ -7,7 +7,7 @@
 
 package com.globaltravelrule.tools.matching.options;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * matching options
@@ -19,28 +19,28 @@ import java.util.Set;
  */
 public class MatchingOptions {
 
-    private Set<String> source;
+    private List<String> source;
 
-    private Set<String> target;
+    private List<String> target;
 
-    public MatchingOptions(Set<String> source,Set<String> target) {
+    public MatchingOptions(List<String> source, List<String> target) {
         this.source = source;
         this.target = target;
     }
 
-    public Set<String> getSource() {
+    public List<String> getSource() {
         return source;
     }
 
-    public void setSource(Set<String> source) {
+    public void setSource(List<String> source) {
         this.source = source;
     }
 
-    public Set<String> getTarget() {
+    public List<String> getTarget() {
         return target;
     }
 
-    public void setTarget(Set<String> target) {
+    public void setTarget(List<String> target) {
         this.target = target;
     }
 }

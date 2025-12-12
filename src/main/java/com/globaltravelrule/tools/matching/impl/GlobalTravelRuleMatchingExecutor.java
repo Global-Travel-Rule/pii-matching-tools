@@ -13,7 +13,7 @@ import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
 import com.globaltravelrule.tools.matching.exceptions.MatchingException;
 import com.globaltravelrule.tools.matching.options.MatchingOptions;
 import com.globaltravelrule.tools.matching.result.MatchingResult;
-import com.globaltravelrule.tools.matching.utils.SetUtils;
+import com.globaltravelrule.tools.matching.utils.NamesUtils;
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,11 +38,13 @@ public class GlobalTravelRuleMatchingExecutor implements MatchingExecutor {
 
     @Override
     public MatchingResult matching(MatchingOptions options) throws MatchingException {
-        String compareSource = SetUtils.nameSetToString(options.getSource());
-        String compareTarget = SetUtils.nameSetToString(options.getTarget());
+        String compareSource = NamesUtils.namesToString(options.getSource());
+        String compareTarget = NamesUtils.namesToString(options.getTarget());
 
         if (compareSource.isEmpty() || compareTarget.isEmpty()) {
-            return new MatchingResult(SetUtils.nameSetToString(options.getSource()), SetUtils.nameSetToString(options.getTarget()), 0f);
+            return new MatchingResult(
+                    NamesUtils.namesToString(options.getSource()),
+                    NamesUtils.namesToString(options.getTarget()), 0f);
         }
         //check any matching logic
         if (compareSource.equals(compareTarget)) {
