@@ -32,7 +32,18 @@ public class GlobalTravelRulePostMatchingProcessor implements PostMatchingProces
         //do rematch logic
         NameMatchingResult newResult = result;
         if (!result.getMatched() && result.getMatchingRate() > 0f) {
-            //if the target name has a middle name, remove the middle name and match again
+            //if the name has a middle name, remove the middle name and match again
+            //source
+            List<List<String>> newNames = new ArrayList<>();
+            for (List<String> name : options.getNames()) {
+                List<String> newName = new ArrayList<>(name);
+                if (newName.size() > 2) {
+                    newName.remove(1);
+                }
+                newNames.add(newName);
+            }
+            options.setNames(newNames);
+            //target
             List<List<String>> newMatchingNames = new ArrayList<>();
             for (List<String> matchingName : options.getMatchingNames()) {
                 List<String> newMatchingName = new ArrayList<>(matchingName);

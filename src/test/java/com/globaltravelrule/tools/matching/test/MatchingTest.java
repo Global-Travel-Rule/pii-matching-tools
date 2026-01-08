@@ -15,10 +15,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class MatchingTest {
 
@@ -35,6 +32,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(null, matchNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchNames, null, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -46,6 +45,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, null, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(null, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -54,6 +55,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(null, null, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(null, null, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -64,6 +67,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -74,6 +79,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -84,6 +91,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -94,6 +103,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -104,6 +115,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -114,6 +127,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -124,6 +139,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -135,6 +152,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -146,6 +165,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -157,6 +178,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -168,6 +191,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -179,6 +204,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -190,6 +217,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -201,6 +230,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -212,6 +243,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -223,6 +256,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -236,6 +271,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -247,6 +284,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -257,6 +296,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -267,6 +308,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -277,6 +320,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -288,6 +333,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -299,6 +346,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -310,6 +359,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -321,6 +372,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -331,6 +384,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -341,6 +396,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -351,6 +408,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -361,6 +420,8 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 
     @Test
@@ -373,5 +434,67 @@ public class MatchingTest {
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestPostCase4() {
+        log.info("nameMatchTestPostCase4");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("KIERON", "HALL")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Kieron", "George", "Hall")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestPostCase5() {
+        log.info("nameMatchTestPostCase5");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Olivia", "Maggs")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Olivia", "Michaela", "Maggs")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestPostCase6() {
+        log.info("nameMatchTestPostCase6");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("SMYRGALA", "MAREK PIOTR")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Marek", "piotr", "Smyrgala")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestPostCase7() {
+        log.info("nameMatchTestPostCase7");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("PIVA", "THIERRY JEAN LUC")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Thierry", "Jean-Luc", "Piva")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestPostCase8() {
+        log.info("nameMatchTestPostCase8");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("NAZYA", "HENARE")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Nazya", "Ray-anne Tarianna", "Henare")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 }

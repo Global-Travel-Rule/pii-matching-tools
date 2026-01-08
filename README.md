@@ -2,7 +2,7 @@
 
 [![Java](https://img.shields.io/badge/Java-11+-orange.svg)](https://openjdk.java.net/)  
 [![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)  
-[![License](https://img.shields.io/badge/license-MPL-blue.svg)](LICENSE.md)  
+[![License](https://img.shields.io/badge/license-MPL-blue.svg)](LICENSE)  
 [![Version](https://img.shields.io/badge/Version-1.0.0-red.svg)](pom.xml)
 
 ## Contents
@@ -74,7 +74,7 @@ graph TD
     G --> K[End]
     F --> |No| H[Calculate Levenshtein ratio]
     H --> J{Check Matching Rate Reach?}
-    J --> |No| L[Rematch: remove middle name of traget matching name]
+    J --> |No| L[Rematch: remove middle name of comparing names]
     L --> N[Calculate Levenshtein ratio]
     N --> M[Return similarity score 0-100]
     M --> K
@@ -263,7 +263,7 @@ Add the library to your pom.xml:
         <dependency>
             <groupId>com.globaltravelrule.tools</groupId>
             <artifactId>pii-matching-tools</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
 </project>
@@ -328,6 +328,12 @@ public class Example {
         NameMatchingResult result3 = MatchingUtils.matchingNames(new NameMatchingOptions(names3, matchingNames3, threshold));
         result3.printMatchingStackTrace();
         System.out.println("matching rate3:" + result3.getMatchingRate() + " matching result3:" + result3.getMatched());
+
+        List<List<String>> names4 = new ArrayList<>(Collections.singletonList(Arrays.asList("KIERON", "HALL")));
+        List<List<String>> matchingNames4 = new ArrayList<>(Collections.singletonList(Arrays.asList("Kieron", "George", "Hall")));
+        NameMatchingResult result4 = MatchingUtils.matchingNames(new NameMatchingOptions(names4, matchingNames4, threshold));
+        result4.printMatchingStackTrace();
+        System.out.println("matching rate4:" + result4.getMatchingRate() + " matching result4:" + result4.getMatched());
     }
 }
 ```
@@ -383,35 +389,55 @@ matching 8 ->
 matching rate1:1.0 matching result1:true
 
 matching 0 -> 
- name : tudor-andrei vilceanu || matchingName : vilceanu tudorandei 
- processedName:vilceanu andrei tudor || processedMatchingName : vilceanu tudorandei 
+ name : tudor-andrei vilceanu || matchingName : tudorandei vilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorandei vilceanu 
  matchingRate : 0.7 
 
 matching 1 -> 
- name : vilceanu tudorandrei || matchingName : vilceanu tudorandei 
- processedName:vilceanu tudorandrei || processedMatchingName : vilceanu tudorandei 
+ name : tudorandrei vilceanu || matchingName : tudorandei vilceanu 
+ processedName:tudorandrei vilceanu || processedMatchingName : tudorandei vilceanu 
  matchingRate : 0.97 
+
+matching 2 -> 
+ name : vilceanu tudorandrei || matchingName : tudorandei vilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorandei vilceanu 
+ matchingRate : 0.97 
+
+matching 3 -> 
+ name : vilceanu tudor-andrei || matchingName : tudorandei vilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorandei vilceanu 
+ matchingRate : 0.7 
+
+matching 4 -> 
+ name : Tudor-Andrei Vilceanu || matchingName : tudorandei vilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorandei vilceanu 
+ matchingRate : 0.7 
+
+matching 5 -> 
+ name : Vilceanu Tudor-Andrei || matchingName : tudorandei vilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorandei vilceanu 
+ matchingRate : 0.7 
 
 matching rate2:1.0 matching result2:true
 
 matching 0 -> 
  name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 1 -> 
  name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 2 -> 
- name : vilceanu tudorandrei || matchingName : tudorvilceanu 
- processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ name : tudorandrei vilceanu || matchingName : tudorvilceanu 
+ processedName:tudorandrei vilceanu || processedMatchingName : tudorvilceanu 
  matchingRate : 0.79 
 
 matching 3 -> 
- name : vilceanu tudorandrei || matchingName : tudorvilceanu 
- processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ name : tudorandrei vilceanu || matchingName : tudorvilceanu 
+ processedName:tudorandrei vilceanu || processedMatchingName : tudorvilceanu 
  matchingRate : 0.79 
 
 matching 4 -> 
@@ -425,36 +451,108 @@ matching 5 ->
  matchingRate : 0.79 
 
 matching 6 -> 
- name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ name : vilceanu tudor-andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 7 -> 
- name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ name : vilceanu tudor-andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 8 -> 
  name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 9 -> 
  name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 10 -> 
- name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ name : Vilceanu Tudor-Andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching 11 -> 
+ name : Vilceanu Tudor-Andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 12 -> 
+ name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 13 -> 
+ name : tudor-andrei vilceanu || matchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 14 -> 
+ name : tudorandrei vilceanu || matchingName : tudorvilceanu 
+ processedName:tudorandrei vilceanu || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 15 -> 
+ name : tudorandrei vilceanu || matchingName : tudorvilceanu 
+ processedName:tudorandrei vilceanu || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 16 -> 
+ name : vilceanu tudorandrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 17 -> 
+ name : vilceanu tudorandrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudorandrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.79 
+
+matching 18 -> 
+ name : vilceanu tudor-andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 19 -> 
+ name : vilceanu tudor-andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 20 -> 
  name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
- processedName:vilceanu andrei tudor || processedMatchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 21 -> 
+ name : Tudor-Andrei Vilceanu || matchingName : tudorvilceanu 
+ processedName:tudor andrei vilceanu || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 22 -> 
+ name : Vilceanu Tudor-Andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
+ matchingRate : 0.76 
+
+matching 23 -> 
+ name : Vilceanu Tudor-Andrei || matchingName : tudorvilceanu 
+ processedName:vilceanu tudor andrei || processedMatchingName : tudorvilceanu 
  matchingRate : 0.76 
 
 matching rate3:0.79 matching result3:false
+
+matching 0 -> 
+ name : KIERON HALL || matchingName : Kieron George Hall 
+ processedName:kieron hall || processedMatchingName : kieron george hall 
+ matchingRate : 0.76 
+
+matching 1 -> 
+ name : KIERON HALL || matchingName : Kieron Hall 
+ processedName:kieron hall || processedMatchingName : kieron hall 
+ matchingRate : 1.0 
+
+matching rate4:1.0 matching result4:true
 ```
 
 ---
@@ -571,14 +669,14 @@ and free of unwanted special characters.
 - NameValidator: Validates individual name fields against configurable rules.
 
   | Allowed Characters                                        | Prohibited Characters            |
-      |:----------------------------------------------------------|:---------------------------------|
+          |:----------------------------------------------------------|:---------------------------------|
   | Alphabetic characters (A-Z, a-z, including international) | Numbers (0-9)                    |
   | Spaces (single spaces between words)                      | Punctuation (.,;:!?)             |
   | Hyphens (-) for compound names                            | Special symbols (@#$%^&*)        |
   | Apostrophes (') for names like O'Connor                   | Emojis and other Unicode symbols |
 
   | Field       | Required      | Max Length | Additional Rules                   |
-      |:------------|:--------------|:-----------|:-----------------------------------|
+          |:------------|:--------------|:-----------|:-----------------------------------|
   | First Name  | Numbers (0-9) | Yes        | 50 chars                           |
   | Middle Name | No            | 50 chars   | Optional; can be empty string      |
   | Last Name   | Yes           | 50 chars   | Cannot start/end with special char |
