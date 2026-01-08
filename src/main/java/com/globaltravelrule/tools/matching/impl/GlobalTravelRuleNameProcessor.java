@@ -9,7 +9,10 @@ package com.globaltravelrule.tools.matching.impl;
 
 import com.globaltravelrule.tools.matching.api.NameProcessor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * default global travel rule name processor
