@@ -93,13 +93,13 @@ public class MatchingUtils {
             List<String> processedNameList = nameList;
             //process name
             for (NameProcessor nameProcessor : options.getNameProcessors()) {
-                processedNameList = nameProcessor.processName(processedNameList);
+                processedNameList = nameProcessor.processName(processedNameList, options);
             }
             for (List<String> matchingNameList : matchingNamesList) {
                 List<String> processedMatchingNameList = matchingNameList;
                 //process matching name
                 for (NameProcessor nameProcessor : options.getNameProcessors()) {
-                    processedMatchingNameList = nameProcessor.processName(processedMatchingNameList);
+                    processedMatchingNameList = nameProcessor.processName(processedMatchingNameList, options);
                 }
                 MatchingResult result = executor.matching(new MatchingOptions(processedNameList, processedMatchingNameList));
                 result.setSource(NamesUtils.namesToString(nameList));

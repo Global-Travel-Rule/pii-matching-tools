@@ -401,6 +401,18 @@ public class MatchingTest {
     }
 
     @Test
+    public void nameMatchTestFuzzyCase10() {
+        log.info("nameMatchTestFuzzyCase10");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("LACHLAN", "OCONNOR")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Lachlan", "Jack", "O'Connor")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
     public void nameMatchTestPostCase1() {
         log.info("nameMatchTestPostCase1");
         List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("KAMAL J MANGROLIYA", "")));

@@ -263,7 +263,7 @@ Add the library to your pom.xml:
         <dependency>
             <groupId>com.globaltravelrule.tools</groupId>
             <artifactId>pii-matching-tools</artifactId>
-            <version>1.0.3</version>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 </project>
@@ -566,11 +566,18 @@ matching rate4:1.0 matching result4:true
     - Constructors:
         - NameMatchingOptions(List<String> names, List<String> matchingNames)
         - NameMatchingOptions(List<String> names, List<String> matchingNames, Float threshold)
-    - Getters/setters: getNames, setNames, getMatchingNames, setMatchingNames, getThreshold, setThreshold,
-      getAlgorithmType, setAlgorithmType, getMatchingNamesProcessors, setMatchingNamesProcessors
-    - names and matching names:
+    - names and matching names (list of string):
         - names input the name value with to be matched information
-        - matchingNames input the matching target name (space division of first name, middle name, and last name)
+        - matchingNames input the matching target name
+    - threshold (float):
+        - threshold for matching rate
+    - removeRegex:
+        - regex to remove unwanted characters from names
+        - default value is `[()（）']`
+    - replaceRegex:
+        - regex to replace unwanted characters from names
+        - override Unicode separators and whitespace
+        - default value is `[-.,\p{Z}\s]+`
 
 - NameMatchingResult
     - getMatchingRate(), setMatchingRate(Float)
@@ -669,14 +676,14 @@ and free of unwanted special characters.
 - NameValidator: Validates individual name fields against configurable rules.
 
   | Allowed Characters                                        | Prohibited Characters            |
-          |:----------------------------------------------------------|:---------------------------------|
+            |:----------------------------------------------------------|:---------------------------------|
   | Alphabetic characters (A-Z, a-z, including international) | Numbers (0-9)                    |
   | Spaces (single spaces between words)                      | Punctuation (.,;:!?)             |
   | Hyphens (-) for compound names                            | Special symbols (@#$%^&*)        |
   | Apostrophes (') for names like O'Connor                   | Emojis and other Unicode symbols |
 
   | Field       | Required      | Max Length | Additional Rules                   |
-          |:------------|:--------------|:-----------|:-----------------------------------|
+            |:------------|:--------------|:-----------|:-----------------------------------|
   | First Name  | Numbers (0-9) | Yes        | 50 chars                           |
   | Middle Name | No            | 50 chars   | Optional; can be empty string      |
   | Last Name   | Yes           | 50 chars   | Cannot start/end with special char |

@@ -43,6 +43,13 @@ public class NameMatchingOptions {
 
     private String algorithmType = "default";
 
+    //remove "() （）'"
+    private String removeRegex = "[()（）']";
+
+    //[-., \ p {Z} \ s]+only handles common punctuation and whitespace,
+    // \ p {Z} and \ s override Unicode separators and whitespace; Merge+into one space
+    private String replaceRegex = "[-.,\\p{Z}\\s]+";
+
     private List<NameProcessor> nameProcessors = new ArrayList<>();
 
     private List<PostMatchingProcessor> postMatchingProcessors = new ArrayList<>();
@@ -108,5 +115,21 @@ public class NameMatchingOptions {
 
     public void setPostMatchingProcessors(List<PostMatchingProcessor> postMatchingProcessors) {
         this.postMatchingProcessors = postMatchingProcessors;
+    }
+
+    public String getRemoveRegex() {
+        return removeRegex;
+    }
+
+    public void setRemoveRegex(String removeRegex) {
+        this.removeRegex = removeRegex;
+    }
+
+    public String getReplaceRegex() {
+        return replaceRegex;
+    }
+
+    public void setReplaceRegex(String replaceRegex) {
+        this.replaceRegex = replaceRegex;
     }
 }

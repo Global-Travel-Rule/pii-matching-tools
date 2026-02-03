@@ -8,6 +8,7 @@
 package com.globaltravelrule.tools.matching.impl;
 
 import com.globaltravelrule.tools.matching.api.NameProcessor;
+import com.globaltravelrule.tools.matching.options.NameMatchingOptions;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,9 +18,9 @@ import java.util.Optional;
 /**
  * default global travel rule name processor
  * <p>
- * 移除()
- * [-.,\p{Z}\s]+ 仅处理常见标点和空白,\p{Z} 和 \s 覆盖 Unicode 分隔符与空白；用 + 合并成一个空格
- * 最后 trim 去除首尾多余空格
+ * Remove special characters
+ * Only handle common punctuation and whitespace, merge+into one space
+ * Finally, remove excess spaces at the beginning and end of the trim
  *
  * @author Global Travel Rule developer
  * @version 1.0.0
@@ -27,21 +28,19 @@ import java.util.Optional;
  */
 public class GlobalTravelRuleNameProcessor implements NameProcessor {
 
-    public static final String SYMBOL_NEED_TO_REPLACE_REGEX = "[-.,\\p{Z}\\s]+";
-
     public static final String NAMES_SPLITER = " ";
 
     @Override
-    public List<String> processName(List<String> nameItems) {
+    public List<String> processName(List<String> nameItems, NameMatchingOptions options) {
         if (nameItems == null || nameItems.isEmpty()) {
             return nameItems;
         }
         List<String> processedNameItems = new ArrayList<>();
         for (String nameItem : nameItems) {
             String processedNameItem = Optional.ofNullable(nameItem).map(t ->
-                    t.toLowerCase().replaceAll(SYMBOL_NEED_TO_REPLACE_REGEX, NAMES_SPLITER).trim())
+                            t.toLowerCase().replaceAll(options.getReplaceRegex(), NAMES_SPLITER).trim())
                     .orElse("");
-            processedNameItem = processedNameItem.replaceAll("[()（）]", "");
+            processedNameItem = processedNameItem.replaceAll(options.getRemoveRegex(), "");
             if (!processedNameItem.isEmpty()) {
                 if (processedNameItem.contains(NAMES_SPLITER)) {
                     processedNameItems.addAll(Arrays.asList(processedNameItem.split(NAMES_SPLITER)));
