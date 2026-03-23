@@ -1,9 +1,9 @@
 # PII Matching Tools Library — Comprehensive Usage Guide
 
-[![Java](https://img.shields.io/badge/Java-11+-orange.svg)](https://openjdk.java.net/)  
-[![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)  
-[![License](https://img.shields.io/badge/license-MPL-blue.svg)](LICENSE)  
-[![Version](https://img.shields.io/badge/Version-1.0.0-red.svg)](pom.xml)
+[![Java](https://img.shields.io/badge/Java-8+-orange.svg)](https://openjdk.java.net/)
+[![Maven](https://img.shields.io/badge/Maven-3.6+-blue.svg)](https://maven.apache.org/)
+[![License](https://img.shields.io/badge/license-MPL-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/Version-1.0.2-red.svg)](pom.xml)
 
 ## Contents
 
@@ -65,21 +65,19 @@ Primary use cases:
 
 ```text
 graph TD
-    A[Start: Input strings str1, str2] --> B[Preprocess: Convert to lowercase & remove punctuation]
-    B --> C[Tokenize: Split into word lists by whitespace]
-    C --> D[Sort: Alphabetically sort tokens]
-    D --> E[Reconstruct: Join sorted tokens with spaces]
-    E --> F{Check empty strings?}
-    F --> |Yes| G[Return score: 0]
-    G --> K[End]
-    F --> |No| H[Calculate Levenshtein ratio]
-    H --> J{Check Matching Rate Reach?}
-    J --> |No| L[Rematch: remove middle name of comparing names]
-    L --> N[Calculate Levenshtein ratio]
-    N --> M[Return similarity score 0-100]
-    M --> K
-    J --> |Yes| I[Return similarity score 0-100]
-    I --> K
+    A[Start: Input name variants] --> B[Cartesian Product: every source variant × every target variant]
+    B --> C[NameProcessor Chain: normalize, lowercase, remove/replace regex, split components]
+    C --> D[MatchingExecutor: compute similarity using selected algorithm]
+    D --> E{Score >= Threshold?}
+    E --> |Yes| F[Return NameMatchingResult: matched=true]
+    F --> K[End]
+    E --> |No| G[PostMatchingProcessor Chain: sequential processors attempt alternative strategies]
+    G --> H[Each processor rematches with modified name variants]
+    H --> I{Any processor achieved threshold?}
+    I --> |Yes| J[Return NameMatchingResult: matched=true, best score]
+    J --> K
+    I --> |No| L[Return NameMatchingResult: matched=false, best score]
+    L --> K
 ```
 
 ### Detailed Process Description
@@ -191,8 +189,8 @@ Processing Steps:
 - MatchingResult / NameMatchingResult — result classes
 
 Component flow (conceptual):
-MatchingUtils -> MatchingExecutor (implementation) -> MatchingNamesProcessor -> MatchingAlgorithm ->
-NameMatchingOptions -> NameMatchingResult
+MatchingUtils → MatchingExecutor (implementation) → MatchingNamesProcessor → MatchingAlgorithm →
+NameMatchingOptions → NameMatchingResult
 
 ---
 
@@ -214,6 +212,12 @@ NameMatchingOptions -> NameMatchingResult
     </dependency>
 
     <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.15</version>
+    </dependency>
+
+    <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>2.0.16</version>
@@ -222,14 +226,14 @@ NameMatchingOptions -> NameMatchingResult
     <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-slf4j2-impl</artifactId>
-        <version>2.24.3</version>
+        <version>2.25.3</version>
     </dependency>
 </dependencies>
 ```
 
 System requirements:
 
-- Java 11+
+- Java 8+
 - Maven 3.6+
 - UTF-8 encoding
 - Minimum 512MB heap for basic operations
@@ -263,7 +267,7 @@ Add the library to your pom.xml:
         <dependency>
             <groupId>com.globaltravelrule.tools</groupId>
             <artifactId>pii-matching-tools</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
     </dependencies>
 </project>
@@ -557,27 +561,32 @@ matching rate4:1.0 matching result4:true
 
 ---
 
-## API Reference (brief)
+## API Reference
 
 - MatchingUtils
     - static NameMatchingResult matchingNames(NameMatchingOptions options)
 
 - NameMatchingOptions
     - Constructors:
-        - NameMatchingOptions(List<String> names, List<String> matchingNames)
-        - NameMatchingOptions(List<String> names, List<String> matchingNames, Float threshold)
-    - names and matching names (list of string):
-        - names input the name value with to be matched information
-        - matchingNames input the matching target name
-    - threshold (float):
-        - threshold for matching rate
-    - removeRegex:
-        - regex to remove unwanted characters from names
-        - default value is `[()（）']`
-    - replaceRegex:
-        - regex to replace unwanted characters from names
-        - override Unicode separators and whitespace
-        - default value is `[-.,\p{Z}\s]+`
+        - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames)` — default processors
+          auto-added
+        - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold)` — with
+          threshold
+        -
+      `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, String algorithmType)` —
+      with algorithm selection
+    - Parameters:
+
+      | Parameter                | Type                          |   | Default                           | Description                                         |
+            |--------------------------|-------------------------------|:--|-----------------------------------|-----------------------------------------------------|
+      | `names`                  | `List<List<String>>`          |   | -                                 | Name variants to be matched                         |
+      | matchingNames`           | `List<List<String>>`          |   | -                                 | Reference/KYC name variants to match against        |
+      | `threshold`              | `Float`                       |   | `null`                            | Similarity threshold (0.0-1.0)                      |
+      | `algorithmType`          | `String`                      |   | `"default"`                       | Matching algorithm type, see Configuration section  |
+      | `removeRegex`            | `String`                      |   | `"[()（）']"`                       | Regex for characters to remove during preprocessing |
+      | `replaceRegex`           | `String`                      |   | `"[-.,\\p{Z}\\s]+"`               | Regex for characters to replace with space          |
+      | `nameProcessors`         | `List<NameProcessor>`         |   | `[GlobalTravelRuleNameProcessor]` | Pre-processing pipeline                             |
+      | `postMatchingProcessors` | `List<PostMatchingProcessor>` |   | `[IgnoreMiddleName, Disorder]`    | Post-matching processor chain                       |
 
 - NameMatchingResult
     - getMatchingRate(), setMatchingRate(Float)
@@ -589,7 +598,16 @@ matching rate4:1.0 matching result4:true
     - source name, target name, similarity score (0.0–1.0)
 
 - MatchingAlgorithm
-    - enum values (e.g., DEFAULT)
+    - enum values: `DEFAULT`, `RATIO`, `PARTIAL_RATIO`, `TOKEN_SET_RATIO`, `TOKEN_SET_PARTIAL_RATIO`,
+      `TOKEN_SORT_PARTIAL_RATIO`, `MIXED`
+
+- PostMatchingProcessor (post-matching chain, executed sequentially when threshold not met)
+    - `GlobalTravelRuleIgnoreMiddleNamePostMatchingProcessor` — removes middle name (index=1) and rematches (default:
+      enabled)
+    - `GlobalTravelRuleDisorderPostMatchingProcessor` — generates all permutations of name components and rematches (
+      default: enabled)
+    - `GlobalTravelRulePhoneticPostMatchingProcessor` — converts Latin names to DoubleMetaphone phonetic codes and
+      rematches (default: **disabled**, opt-in)
 
 Exceptions:
 
@@ -638,16 +656,76 @@ Built-in processing:
 
 ## Configuration
 
-Threshold examples:
+### Threshold
 
-- Strict: 0.95
-- Moderate: 0.85
-- Lenient: 0.70
-- Very lenient: 0.50
+| Level        | Value | Use Case                            |
+|--------------|-------|-------------------------------------|
+| Strict       | 0.95  | High-confidence compliance matching |
+| Moderate     | 0.85  | Standard KYC verification           |
+| Lenient      | 0.70  | Broad screening                     |
+| Very lenient | 0.50  | Exploratory matching                |
 
-Algorithm type: currently "default" (options.setAlgorithmType to change/extend).
+### Matching Algorithm Types
 
-Logging: uses SLF4J. Configure via log4j2.xml or your chosen logging backend.
+Select via `algorithmType` parameter in `NameMatchingOptions` constructor or `setAlgorithmType()`:
+
+| algorithmType                | Enum                       | Description                                                                                   |
+|------------------------------|----------------------------|-----------------------------------------------------------------------------------------------|
+| `"default"`                  | `DEFAULT`                  | Token Sort Ratio — sorts tokens alphabetically then computes Levenshtein similarity (default) |
+| `"ratio"`                    | `RATIO`                    | Simple Levenshtein similarity ratio                                                           |
+| `"partial_ratio"`            | `PARTIAL_RATIO`            | Best partial substring match                                                                  |
+| `"token_set_ratio"`          | `TOKEN_SET_RATIO`          | Deduplicated token matching, useful for strings with redundant words                          |
+| `"token_set_partial_ratio"`  | `TOKEN_SET_PARTIAL_RATIO`  | Deduplicated tokens + partial substring match                                                 |
+| `"token_sort_partial_ratio"` | `TOKEN_SORT_PARTIAL_RATIO` | Sorted tokens + partial substring match                                                       |
+| `"mixed"`                    | `MIXED`                    | Takes max of ratio and token_sort_partial_ratio                                               |
+
+Example — using mixed algorithm:
+
+```java
+NameMatchingOptions options = new NameMatchingOptions(names, matchingNames, 0.8f, "mixed");
+NameMatchingResult result = MatchingUtils.matchingNames(options);
+```
+
+### Post-Matching Processors
+
+Post-processors run sequentially when the initial matching score does not meet the threshold. Each processor attempts an
+alternative matching strategy and takes the best score.
+
+| Processor                                               | Default      | Description                                                                                                                                 |
+|---------------------------------------------------------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `GlobalTravelRuleIgnoreMiddleNamePostMatchingProcessor` | enabled      | Removes the middle name component (index=1) and rematches; applies to names with 3+ components                                              |
+| `GlobalTravelRuleDisorderPostMatchingProcessor`         | enabled      | Generates all permutations of name components and rematches; solves name-order issues for non-Latin languages                               |
+| `GlobalTravelRulePhoneticPostMatchingProcessor`         | **optional** | Converts Latin name components to DoubleMetaphone phonetic codes and rematches; handles spelling variations and transliteration differences |
+
+Enable the phonetic processor (append to default chain):
+
+```java
+NameMatchingOptions options = new NameMatchingOptions(names, matchingNames, 0.8f);
+// Phonetic runs after IgnoreMiddleName and Disorder in this configuration
+options.getPostMatchingProcessors().add(new GlobalTravelRulePhoneticPostMatchingProcessor());
+NameMatchingResult result = MatchingUtils.matchingNames(options);
+```
+
+Fully customize processors with ordering control (no-arg constructor):
+
+```java
+NameMatchingOptions options = new NameMatchingOptions();
+options.setNames(names);
+options.setMatchingNames(matchingNames);
+options.setThreshold(0.8f);
+options.setAlgorithmType("mixed");
+options.getNameProcessors().add(new GlobalTravelRuleNameProcessor());
+
+// Phonetic runs first with original clean names for best accuracy
+options.getPostMatchingProcessors().add(new GlobalTravelRulePhoneticPostMatchingProcessor());
+options.getPostMatchingProcessors().add(new GlobalTravelRuleIgnoreMiddleNamePostMatchingProcessor());
+options.getPostMatchingProcessors().add(new GlobalTravelRuleDisorderPostMatchingProcessor());
+NameMatchingResult result = MatchingUtils.matchingNames(options);
+```
+
+### Logging
+
+Uses SLF4J. Configure via log4j2.xml or your chosen logging backend.
 
 ---
 
@@ -676,14 +754,14 @@ and free of unwanted special characters.
 - NameValidator: Validates individual name fields against configurable rules.
 
   | Allowed Characters                                        | Prohibited Characters            |
-            |:----------------------------------------------------------|:---------------------------------|
+    |:----------------------------------------------------------|:---------------------------------|
   | Alphabetic characters (A-Z, a-z, including international) | Numbers (0-9)                    |
   | Spaces (single spaces between words)                      | Punctuation (.,;:!?)             |
   | Hyphens (-) for compound names                            | Special symbols (@#$%^&*)        |
   | Apostrophes (') for names like O'Connor                   | Emojis and other Unicode symbols |
 
   | Field       | Required      | Max Length | Additional Rules                   |
-            |:------------|:--------------|:-----------|:-----------------------------------|
+    |:------------|:--------------|:-----------|:-----------------------------------|
   | First Name  | Numbers (0-9) | Yes        | 50 chars                           |
   | Middle Name | No            | 50 chars   | Optional; can be empty string      |
   | Last Name   | Yes           | 50 chars   | Cannot start/end with special char |
@@ -729,7 +807,7 @@ Debugging helpers and examples are provided to print match traces and all scores
 
 Development flow:
 
-- Fork -> branch -> implement -> add tests -> mvn clean test -> create PR
+- Fork → branch → implement → add tests → mvn clean test → create PR
 
 Requirements:
 
@@ -739,7 +817,7 @@ Requirements:
 
 ---
 
-## FAQ (brief)
+## FAQ
 
 Q: What is the difference between names and matchingNames?  
 A: names = input names to be matched; matchingNames = reference/KYC names to match against. The library compares each
@@ -758,7 +836,7 @@ A: Yes, MatchingUtils main methods are thread-safe.
 
 ## License
 
-Copyright (c) 2022-2025 Global Travel Rule • globaltravelrule.com  
+Copyright © 2022-2025 Global Travel Rule • globaltravelrule.com  
 See LICENSE file for details.
 
 ---
