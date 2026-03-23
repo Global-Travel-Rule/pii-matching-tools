@@ -8,6 +8,8 @@
 package com.globaltravelrule.tools.matching.test;
 
 import com.globaltravelrule.tools.matching.MatchingUtils;
+import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
+import com.globaltravelrule.tools.matching.impl.GlobalTravelRulePhoneticPostMatchingProcessor;
 import com.globaltravelrule.tools.matching.options.NameMatchingOptions;
 import com.globaltravelrule.tools.matching.result.NameMatchingResult;
 import org.junit.Assert;
@@ -413,10 +415,184 @@ public class MatchingTest {
     }
 
     @Test
+    public void nameMatchTestFuzzyCase11() {
+        log.info("nameMatchTestFuzzyCase11");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("欢", "陶")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("陶欢", "", "")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase12() {
+        log.info("nameMatchTestFuzzyCase12");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("建豪", "陳")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("陳建豪", "", "")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase13() {
+        log.info("nameMatchTestFuzzyCase13");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Yonlonfoun", "senami Rebeca")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("REBECCA", "SENAMI", "GNONLONFOUN")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase14() {
+        log.info("nameMatchTestFuzzyCase14");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("宛姍", "劉")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("", "", "劉宛姍")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase15() {
+        log.info("nameMatchTestFuzzyCase15");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Tuncay Özcan", "")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Tuncay", "", "Ozcan")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase16() {
+        log.info("nameMatchTestFuzzyCase16");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("陳雅瑜", "")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("雅瑜", "", "陳")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase17() {
+        log.info("nameMatchTestFuzzyCase17");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("윤삼광", "")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("삼광", "", "윤")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase18() {
+        log.info("nameMatchTestFuzzyCase18");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("MATEO", "PENAFLOR PERALTA")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Mateo", "", "Peñaflor")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase19() {
+        log.info("nameMatchTestFuzzyCase19");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("MATEO", "PENAFLOR PERALTA")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Mateo", "", "Peñaflor")));
+        NameMatchingResult result = MatchingUtils.matchingNames(
+                new NameMatchingOptions(names, matchingNames, THRESHOLD, MatchingAlgorithm.MIXED.getName())
+        );
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, MatchingAlgorithm.MIXED.getName()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase20() {
+        log.info("nameMatchTestFuzzyCase20");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("MATEO", "PENAFLOR PERALTA")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Mateo", "", "Peñaflor")));
+        NameMatchingOptions options = new NameMatchingOptions(names, matchingNames, THRESHOLD, MatchingAlgorithm.DEFAULT.getName());
+        options.getPostMatchingProcessors().add(new GlobalTravelRulePhoneticPostMatchingProcessor());
+        NameMatchingResult result = MatchingUtils.matchingNames(options);
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        options.setNames(matchingNames);
+        options.setMatchingNames(names);
+        NameMatchingResult result2 = MatchingUtils.matchingNames(options);
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase21() {
+        log.info("nameMatchTestFuzzyCase21");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Hüseyin", "Çağrı")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("MELİH", "", "TÜMKAYA")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase22() {
+        log.info("nameMatchTestFuzzyCase22");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Yılmaz", "Yunus")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Yunus", "", "Yılmaz")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase23() {
+        log.info("nameMatchTestFuzzyCase23");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Hüseyin", "Çağrı")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("HÜSEYİN", "ÇAĞRI", "KIZICI")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertFalse(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void nameMatchTestFuzzyCase24() {
+        log.info("nameMatchTestFuzzyCase24");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Kızıcı", "Hüseyin Çağrı")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("HÜSEYİN", "ÇAĞRI", "KIZICI")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
     public void nameMatchTestPostCase1() {
         log.info("nameMatchTestPostCase1");
         List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("KAMAL J MANGROLIYA", "")));
-        List<List<String>> matchingNames = Arrays.asList(Arrays.asList("KAMAL", "JAYSUKHBHAI", "MANGROLIYA"), Arrays.asList("MANGROLIYA", "JAYSUKHBHAI"));
+        List<List<String>> matchingNames = new ArrayList<>(Arrays.asList(Arrays.asList("KAMAL", "JAYSUKHBHAI", "MANGROLIYA"), Arrays.asList("MANGROLIYA", "JAYSUKHBHAI")));
         NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());

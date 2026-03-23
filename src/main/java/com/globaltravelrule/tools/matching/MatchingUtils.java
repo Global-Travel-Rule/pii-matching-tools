@@ -50,7 +50,7 @@ public class MatchingUtils {
         });
     }
 
-    public static MatchingUtils getInstance() {
+    private static MatchingUtils getInstance() {
         if (instance == null) {
             synchronized (MatchingUtils.class) {
                 if (instance == null) {
@@ -69,7 +69,7 @@ public class MatchingUtils {
      * @throws MatchingException matching exception
      *
      */
-    public NameMatchingResult doMatchingNames(NameMatchingOptions options) {
+    private NameMatchingResult doMatchingNames(NameMatchingOptions options) {
         float matchingRate = 0f;
         boolean matched;
         if (options.getNames() == null || options.getNames().isEmpty() || options.getMatchingNames() == null || options.getMatchingNames().isEmpty() || options.getThreshold() == null) {
@@ -78,8 +78,7 @@ public class MatchingUtils {
         }
 
         MatchingExecutor executor = getMatchingExecutor(options.getAlgorithmType());
-        final List<List<String>> namesList = new ArrayList<>() {
-        };
+        final List<List<String>> namesList = new ArrayList<>();
         if (options.getNames() != null) {
             options.getNames().forEach(nameItems -> namesList.add(new ArrayList<>(nameItems)));
         }

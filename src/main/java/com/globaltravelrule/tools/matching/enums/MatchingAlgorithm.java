@@ -21,7 +21,13 @@ import java.util.stream.Collectors;
  */
 public enum MatchingAlgorithm {
 
-    DEFAULT("default", "any match and fuzzy matching algorithm");
+    DEFAULT("default", "any match and fuzzy matching algorithm with sort tokens"),
+    RATIO("ratio", "any match and fuzzy matching algorithm"),
+    PARTIAL_RATIO("partial_ratio", "any match and fuzzy matching algorithm with best partial matching"),
+    TOKEN_SET_RATIO("token_set_ratio", "any match and fuzzy matching algorithm, useful for strings where words appear redundantly"),
+    TOKEN_SET_PARTIAL_RATIO("token_set_partial_ratio", "any match and fuzzy matching algorithm with best partial matching, useful for strings where words appear redundantly"),
+    TOKEN_SORT_PARTIAL_RATIO("token_sort_partial_ratio", "any match and fuzzy matching algorithm with sort tokens and best partial matching"),
+    MIXED("mixed", "any match and fuzzy matching algorithm with partial and token set matching, useful for strings where words appear redundantly");
 
     private static final Map<String, MatchingAlgorithm> MAP;
 

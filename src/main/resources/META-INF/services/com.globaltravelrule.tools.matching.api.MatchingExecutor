@@ -6,3 +6,9 @@
 #
 
 com.globaltravelrule.tools.matching.impl.GlobalTravelRuleMatchingExecutor
+com.globaltravelrule.tools.matching.impl.GlobalTravelRuleRatioMatchingExecutor
+com.globaltravelrule.tools.matching.impl.GlobalTravelRulePartialMatchingExecutor
+com.globaltravelrule.tools.matching.impl.GlobalTravelRuleTokenSetMatchingExecutor
+com.globaltravelrule.tools.matching.impl.GlobalTravelRuleTokenSetPartialMatchingExecutor
+com.globaltravelrule.tools.matching.impl.GlobalTravelRuleTokenSortPartialMatchingExecutor
+com.globaltravelrule.tools.matching.impl.GlobalTravelRuleMixedMatchingExecutor

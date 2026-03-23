@@ -9,8 +9,9 @@ package com.globaltravelrule.tools.matching.options;
 
 import com.globaltravelrule.tools.matching.api.NameProcessor;
 import com.globaltravelrule.tools.matching.api.PostMatchingProcessor;
+import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleDisorderPostMatchingProcessor;
+import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleIgnoreMiddleNamePostMatchingProcessor;
 import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleNameProcessor;
-import com.globaltravelrule.tools.matching.impl.GlobalTravelRulePostMatchingProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +62,24 @@ public class NameMatchingOptions {
         this.names = names;
         this.matchingNames = matchingNames;
         this.nameProcessors.add(new GlobalTravelRuleNameProcessor());
-        this.postMatchingProcessors.add(new GlobalTravelRulePostMatchingProcessor());
+        //ignore middle name post matching
+        this.postMatchingProcessors.add(new GlobalTravelRuleIgnoreMiddleNamePostMatchingProcessor());
+        //disorder post matching - tries all permutations
+        this.postMatchingProcessors.add(new GlobalTravelRuleDisorderPostMatchingProcessor());
+
+        //phonetic post matching - run FIRST with original clean names
+        //for handling spelling variations and transliteration differences
+        //this.postMatchingProcessors.add(new GlobalTravelRulePhoneticPostMatchingProcessor());
     }
 
     public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold) {
         this(names, matchingNames);
+        this.threshold = threshold;
+    }
+
+    public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, String algorithmType) {
+        this(names, matchingNames);
+        this.algorithmType = algorithmType;
         this.threshold = threshold;
     }
 
