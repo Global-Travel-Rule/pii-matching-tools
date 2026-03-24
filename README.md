@@ -54,6 +54,7 @@ Primary use cases:
 - Extensible plugin-based architecture for custom matching algorithms
 - Detailed match results and trace output
 - Intelligent handling of diacritics, hyphens, apostrophes, spaces, and name order variations
+- Entity name variation removal — opt-in stripping of legal entity suffixes (Ltd, LLC, Pte Ltd, Inc, etc.) and full-width to half-width character conversion
 
 ---
 
@@ -186,6 +187,7 @@ Processing Steps:
 - MatchingNamesProcessor (interface) — pre-processing of names
 - MatchingAlgorithm (enum)
 - NameMatchingOptions / MatchingOptions — configuration classes
+- NameMatchingExtendedOptions — extended feature flags (e.g., entity name variation removal)
 - MatchingResult / NameMatchingResult — result classes
 
 Component flow (conceptual):
@@ -267,7 +269,7 @@ Add the library to your pom.xml:
         <dependency>
             <groupId>com.globaltravelrule.tools</groupId>
             <artifactId>pii-matching-tools</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.6</version>
         </dependency>
     </dependencies>
 </project>
@@ -572,21 +574,24 @@ matching rate4:1.0 matching result4:true
           auto-added
         - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold)` — with
           threshold
-        -
-      `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, String algorithmType)` —
+        - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, String algorithmType)` —
       with algorithm selection
+        - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, NameMatchingExtendedOptions extendedOptions)` — with extended options
+        - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, NameMatchingExtendedOptions extendedOptions)` — with threshold + extended options
+        - `NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, String algorithmType, NameMatchingExtendedOptions extendedOptions)` — with all options
     - Parameters:
 
-      | Parameter                | Type                          |   | Default                           | Description                                         |
-            |--------------------------|-------------------------------|:--|-----------------------------------|-----------------------------------------------------|
-      | `names`                  | `List<List<String>>`          |   | -                                 | Name variants to be matched                         |
-      | matchingNames`           | `List<List<String>>`          |   | -                                 | Reference/KYC name variants to match against        |
-      | `threshold`              | `Float`                       |   | `null`                            | Similarity threshold (0.0-1.0)                      |
-      | `algorithmType`          | `String`                      |   | `"default"`                       | Matching algorithm type, see Configuration section  |
-      | `removeRegex`            | `String`                      |   | `"[()（）']"`                       | Regex for characters to remove during preprocessing |
-      | `replaceRegex`           | `String`                      |   | `"[-.,\\p{Z}\\s]+"`               | Regex for characters to replace with space          |
-      | `nameProcessors`         | `List<NameProcessor>`         |   | `[GlobalTravelRuleNameProcessor]` | Pre-processing pipeline                             |
-      | `postMatchingProcessors` | `List<PostMatchingProcessor>` |   | `[IgnoreMiddleName, Disorder]`    | Post-matching processor chain                       |
+      | Parameter                | Type                          |   | Default                             | Description                                         |
+      |--------------------------|-------------------------------|:--|-------------------------------------|-----------------------------------------------------|
+      | `names`                  | `List<List<String>>`          |   | -                                   | Name variants to be matched                         |
+      | `matchingNames`          | `List<List<String>>`          |   | -                                   | Reference/KYC name variants to match against        |
+      | `threshold`              | `Float`                       |   | `null`                              | Similarity threshold (0.0-1.0)                      |
+      | `algorithmType`          | `String`                      |   | `"default"`                         | Matching algorithm type, see Configuration section  |
+      | `removeRegex`            | `String`                      |   | `"[()（）']"`                         | Regex for characters to remove during preprocessing |
+      | `replaceRegex`           | `String`                      |   | `"[-.,\\p{Z}\\s]+"`                 | Regex for characters to replace with space          |
+      | `nameProcessors`         | `List<NameProcessor>`         |   | `[GlobalTravelRuleNameProcessor]`   | Pre-processing pipeline                             |
+      | `postMatchingProcessors` | `List<PostMatchingProcessor>` |   | `[IgnoreMiddleName, Disorder]`      | Post-matching processor chain                       |
+      | `extendedOptions`        | `NameMatchingExtendedOptions` |   | `new NameMatchingExtendedOptions()` | Extended feature flags (entity variation removal)   |
 
 - NameMatchingResult
     - getMatchingRate(), setMatchingRate(Float)
@@ -596,6 +601,16 @@ matching rate4:1.0 matching result4:true
 
 - MatchingResult
     - source name, target name, similarity score (0.0–1.0)
+
+- NameMatchingExtendedOptions
+    - Constructors:
+        - `NameMatchingExtendedOptions()` — all flags default to `false`
+        - `NameMatchingExtendedOptions(boolean enableReplaceEntityNameVariations)` — convenience constructor
+    - Properties:
+
+      | Property                            | Type      | Default | Description                                                                                  |
+      |-------------------------------------|-----------|---------|----------------------------------------------------------------------------------------------|
+      | `enableReplaceEntityNameVariations` | `boolean` | `false` | When `true`, adds `GlobalTravelRuleEntityNameVariationProcessor` to the name processor chain |
 
 - MatchingAlgorithm
     - enum values: `DEFAULT`, `RATIO`, `PARTIAL_RATIO`, `TOKEN_SET_RATIO`, `TOKEN_SET_PARTIAL_RATIO`,
@@ -635,7 +650,22 @@ Exceptions:
    Support for batching or multithreaded parallel calls to MatchingUtils.matchingNames. See ParallelMatchingProcessor
    example in docs.
 
-5) Error handling  
+5) Entity name matching with legal suffix removal
+
+```java
+NameMatchingExtendedOptions extendedOptions = new NameMatchingExtendedOptions(true);
+
+List<List<String>> names = new ArrayList<>(Collections.singletonList(
+    Arrays.asList("Acme", "Pte", "Ltd")));
+List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(
+    Arrays.asList("Acme", "Private", "Limited")));
+
+NameMatchingResult result = MatchingUtils.matchingNames(
+    new NameMatchingOptions(names, matchingNames, 0.8f, extendedOptions));
+// Both reduce to "acme" after suffix removal → matchingRate: 1.0, matched: true
+```
+
+6) Error handling
    Catch MatchingException and general Exception; return default NameMatchingResult or log errors.
 
 ---
@@ -723,6 +753,40 @@ options.getPostMatchingProcessors().add(new GlobalTravelRuleDisorderPostMatching
 NameMatchingResult result = MatchingUtils.matchingNames(options);
 ```
 
+### Entity Name Variation Processor
+
+An opt-in pre-processor that strips common legal entity suffixes from company names before matching. Enable it via `NameMatchingExtendedOptions`:
+
+```java
+NameMatchingExtendedOptions extendedOptions = new NameMatchingExtendedOptions(true);
+NameMatchingOptions options = new NameMatchingOptions(names, matchingNames, 0.8f, extendedOptions);
+NameMatchingResult result = MatchingUtils.matchingNames(options);
+```
+
+**Capabilities:**
+- Removes 12 categories of legal entity suffixes with word-boundary matching
+- Converts full-width characters (U+FF01–U+FF5E) to half-width equivalents
+- Terms loaded from `entity-name-terms.properties` on the classpath
+
+**Supported entity suffixes:**
+
+| S/N | Standard Terms                          | Variations                                      |
+|-----|-----------------------------------------|-------------------------------------------------|
+| 1   | Private                                 | Pte, Pvt, Pvt.                                  |
+| 2   | Limited                                 | Ltd, Ltd.,                                      |
+| 3   | Private Limited                         | Pte Ltd, Pte. Ltd., Pvt Ltd, Pvt. Ltd.          |
+| 4   | Limited Liability Company               | LLC, L.L.C.                                     |
+| 5   | Incorporated                            | Inc, Inc.                                       |
+| 6   | Limited Partnership                     | LP, L.P., Ltd Partnership                       |
+| 7   | Proprietary Limited                     | Pty Ltd, Pty. Ltd.                              |
+| 8   | Company                                 | Co, Co.                                         |
+| 9   | Public Limited Company                  | PLC, P.L.C.                                     |
+| 10  | Limited Liability Partnership           | LLP, L.L.P.                                     |
+| 11  | Spółka z ograniczoną odpowiedzialnością | SP. Z O.O., Spolka z o.o., sp z o o, sp. z o.o. |
+| 12  | Sociedad Limitada                       | SL, S.L.                                        |
+
+**Note:** This processor runs *after* the default `GlobalTravelRuleNameProcessor`, so input is already lowercased, diacritics-stripped, and split on whitespace. Terms in the properties file reflect this post-processed form.
+
 ### Logging
 
 Uses SLF4J. Configure via log4j2.xml or your chosen logging backend.
@@ -754,14 +818,14 @@ and free of unwanted special characters.
 - NameValidator: Validates individual name fields against configurable rules.
 
   | Allowed Characters                                        | Prohibited Characters            |
-    |:----------------------------------------------------------|:---------------------------------|
+  |:----------------------------------------------------------|:---------------------------------|
   | Alphabetic characters (A-Z, a-z, including international) | Numbers (0-9)                    |
   | Spaces (single spaces between words)                      | Punctuation (.,;:!?)             |
   | Hyphens (-) for compound names                            | Special symbols (@#$%^&*)        |
   | Apostrophes (') for names like O'Connor                   | Emojis and other Unicode symbols |
 
   | Field       | Required      | Max Length | Additional Rules                   |
-    |:------------|:--------------|:-----------|:-----------------------------------|
+  |:------------|:--------------|:-----------|:-----------------------------------|
   | First Name  | Numbers (0-9) | Yes        | 50 chars                           |
   | Middle Name | No            | 50 chars   | Optional; can be empty string      |
   | Last Name   | Yes           | 50 chars   | Cannot start/end with special char |

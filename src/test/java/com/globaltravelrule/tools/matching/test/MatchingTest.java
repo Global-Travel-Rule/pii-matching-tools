@@ -10,6 +10,7 @@ package com.globaltravelrule.tools.matching.test;
 import com.globaltravelrule.tools.matching.MatchingUtils;
 import com.globaltravelrule.tools.matching.enums.MatchingAlgorithm;
 import com.globaltravelrule.tools.matching.impl.GlobalTravelRulePhoneticPostMatchingProcessor;
+import com.globaltravelrule.tools.matching.options.NameMatchingExtendedOptions;
 import com.globaltravelrule.tools.matching.options.NameMatchingOptions;
 import com.globaltravelrule.tools.matching.result.NameMatchingResult;
 import org.junit.Assert;
@@ -683,6 +684,132 @@ public class MatchingTest {
         result.printMatchingStackTrace();
         Assert.assertTrue(result.getMatched());
         NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    // --- Entity Name Variation Processor Tests ---
+
+    private NameMatchingExtendedOptions entityVariationEnabled() {
+        return new NameMatchingExtendedOptions(true);
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationPteLtd() {
+        log.info("testMatchingNamesEntityVariationPteLtd");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("ABC", "Pte. Ltd.")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("ABC")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationLLC() {
+        log.info("testMatchingNamesEntityVariationLLC");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("XYZ", "LLC")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("XYZ")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationDisabled() {
+        log.info("testMatchingNamesEntityVariationDisabled");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("ABC", "Private Limited")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("ABC")));
+        // Without entity variation enabled, "ABC Private Limited" vs "ABC" should NOT match
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD));
+        result.printMatchingStackTrace();
+        Assert.assertFalse(result.getMatched());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationInc() {
+        log.info("testMatchingNamesEntityVariationInc");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Global", "Corp", "Inc.")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("Global", "Corp")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationMultiWord() {
+        log.info("testMatchingNamesEntityVariationMultiWord");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Acme", "Limited Liability Company")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("Acme")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationPolish() {
+        log.info("testMatchingNamesEntityVariationPolish");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Firma", "SP. Z O.O.")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("Firma")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesFullWidthConversion() {
+        log.info("testMatchingNamesFullWidthConversion");
+        // Full-width "ＡＢＣ" should match half-width "ABC" when entity variation is enabled
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Collections.singletonList("\uFF21\uFF22\uFF23")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("ABC")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationWordBoundary() {
+        log.info("testMatchingNamesEntityVariationWordBoundary");
+        // "Cohen" should NOT have "Co" stripped — word boundary prevents it
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Collections.singletonList("Cohen")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("Cohen")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationSpanish() {
+        log.info("testMatchingNamesEntityVariationSpanish");
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("Empresa", "S.L.")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("Empresa")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationBothSidesHaveSuffix() {
+        log.info("testMatchingNamesEntityVariationBothSidesHaveSuffix");
+        // Both sides have entity suffixes — should still match after stripping
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Arrays.asList("ABC", "Pte. Ltd.")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Arrays.asList("ABC", "Private Limited")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
         Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
 }

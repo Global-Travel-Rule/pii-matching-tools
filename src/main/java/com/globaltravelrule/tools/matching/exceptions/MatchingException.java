@@ -17,6 +17,10 @@ package com.globaltravelrule.tools.matching.exceptions;
  */
 public class MatchingException extends RuntimeException {
 
+    public MatchingException(Throwable cause) {
+        super(cause);
+    }
+
     public MatchingException(String message) {
         super(message);
     }
