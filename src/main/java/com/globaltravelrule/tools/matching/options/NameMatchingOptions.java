@@ -10,6 +10,7 @@ package com.globaltravelrule.tools.matching.options;
 import com.globaltravelrule.tools.matching.api.NameProcessor;
 import com.globaltravelrule.tools.matching.api.PostMatchingProcessor;
 import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleDisorderPostMatchingProcessor;
+import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleEntityNameVariationProcessor;
 import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleIgnoreMiddleNamePostMatchingProcessor;
 import com.globaltravelrule.tools.matching.impl.GlobalTravelRuleNameProcessor;
 
@@ -55,6 +56,8 @@ public class NameMatchingOptions {
 
     private List<PostMatchingProcessor> postMatchingProcessors = new ArrayList<>();
 
+    private NameMatchingExtendedOptions extendedOptions = new NameMatchingExtendedOptions();
+
     public NameMatchingOptions() {
     }
 
@@ -81,6 +84,33 @@ public class NameMatchingOptions {
         this(names, matchingNames);
         this.algorithmType = algorithmType;
         this.threshold = threshold;
+    }
+
+    public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, NameMatchingExtendedOptions extendedOptions) {
+        this(names, matchingNames);
+        this.extendedOptions = extendedOptions;
+        applyExtendedOptions();
+    }
+
+    public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, NameMatchingExtendedOptions extendedOptions) {
+        this(names, matchingNames);
+        this.threshold = threshold;
+        this.extendedOptions = extendedOptions;
+        applyExtendedOptions();
+    }
+
+    public NameMatchingOptions(List<List<String>> names, List<List<String>> matchingNames, Float threshold, String algorithmType, NameMatchingExtendedOptions extendedOptions) {
+        this(names, matchingNames);
+        this.algorithmType = algorithmType;
+        this.threshold = threshold;
+        this.extendedOptions = extendedOptions;
+        applyExtendedOptions();
+    }
+
+    private void applyExtendedOptions() {
+        if (extendedOptions != null && extendedOptions.isEnableReplaceEntityNameVariations()) {
+            this.nameProcessors.add(new GlobalTravelRuleEntityNameVariationProcessor());
+        }
     }
 
     public List<List<String>> getNames() {
@@ -145,5 +175,13 @@ public class NameMatchingOptions {
 
     public void setReplaceRegex(String replaceRegex) {
         this.replaceRegex = replaceRegex;
+    }
+
+    public NameMatchingExtendedOptions getExtendedOptions() {
+        return extendedOptions;
+    }
+
+    public void setExtendedOptions(NameMatchingExtendedOptions extendedOptions) {
+        this.extendedOptions = extendedOptions;
     }
 }
