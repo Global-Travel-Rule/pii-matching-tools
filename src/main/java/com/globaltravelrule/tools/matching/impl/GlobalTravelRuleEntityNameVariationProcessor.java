@@ -58,6 +58,13 @@ public class GlobalTravelRuleEntityNameVariationProcessor implements NameProcess
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
     /**
+     * Literal "null/" prefix left behind when an upstream caller concatenates an empty field
+     * into the entity name, e.g. "null/Acme sp. z o.o.". Only the slash form is stripped
+     * so a genuine name containing the word "null" is untouched.
+     */
+    private static final Pattern NULL_ARTIFACT_PATTERN = Pattern.compile("(?:^|(?<=\\s))null/");
+
+    /**
      * Load entity terms from the classpath properties file and build a single combined
      * alternation regex pattern for efficient single-pass matching.
      *
@@ -182,7 +189,7 @@ public class GlobalTravelRuleEntityNameVariationProcessor implements NameProcess
             }
             joined.append(converted.get(i));
         }
-        String text = joined.toString();
+        String text = NULL_ARTIFACT_PATTERN.matcher(joined.toString()).replaceAll(" ");
 
         // Step 3: Single-pass entity term removal (all terms combined in one alternation pattern)
         text = ENTITY_PATTERN.matcher(text).replaceAll("");

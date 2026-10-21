@@ -812,4 +812,30 @@ public class MatchingTest {
         NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
         Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
     }
+
+    @Test
+    public void testMatchingNamesEntityVariationPolishFullVsAbbreviated() {
+        log.info("testMatchingNamesEntityVariationPolishFullVsAbbreviated");
+        // "ł" has no NFD decomposition; it must be folded to "l" so the full Polish legal form is stripped
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Collections.singletonList("ACME SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("Acme sp. z o.o.")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
+
+    @Test
+    public void testMatchingNamesEntityVariationPolishNullPrefix() {
+        log.info("testMatchingNamesEntityVariationPolishNullPrefix");
+        // Upstream concatenated an empty field into the name, leaving a "null/" prefix
+        List<List<String>> names = new ArrayList<>(Collections.singletonList(Collections.singletonList("ACME SPÓŁKA Z OGRANICZONĄ ODPOWIEDZIALNOŚCIĄ")));
+        List<List<String>> matchingNames = new ArrayList<>(Collections.singletonList(Collections.singletonList("null/Acme sp. z o.o.")));
+        NameMatchingResult result = MatchingUtils.matchingNames(new NameMatchingOptions(names, matchingNames, THRESHOLD, entityVariationEnabled()));
+        result.printMatchingStackTrace();
+        Assert.assertTrue(result.getMatched());
+        NameMatchingResult result2 = MatchingUtils.matchingNames(new NameMatchingOptions(matchingNames, names, THRESHOLD, entityVariationEnabled()));
+        Assert.assertEquals(result.getMatchingRate(), result2.getMatchingRate());
+    }
 }
