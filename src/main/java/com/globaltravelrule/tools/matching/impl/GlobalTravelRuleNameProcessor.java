@@ -47,7 +47,32 @@ public class GlobalTravelRuleNameProcessor implements NameProcessor {
         // NFD = Canonical Decomposition (é -> e + ´)
         String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
         // Remove combining diacritical marks (\p{M} = Mark category in Unicode)
-        return normalized.replaceAll("\\p{M}", "");
+        return foldStrokeLetters(normalized.replaceAll("\\p{M}", ""));
+    }
+
+    // Stroke letters have no NFD decomposition, so they survive mark removal (e.g. "spółka" vs "spolka")
+    private String foldStrokeLetters(String text) {
+        StringBuilder sb = null;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            char folded;
+            switch (c) {
+                case 'Ł': folded = 'L'; break;
+                case 'ł': folded = 'l'; break;
+                case 'Ø': folded = 'O'; break;
+                case 'ø': folded = 'o'; break;
+                case 'Đ': folded = 'D'; break;
+                case 'đ': folded = 'd'; break;
+                default: folded = c;
+            }
+            if (folded != c && sb == null) {
+                sb = new StringBuilder(text);
+            }
+            if (sb != null) {
+                sb.setCharAt(i, folded);
+            }
+        }
+        return sb == null ? text : sb.toString();
     }
 
     @Override
